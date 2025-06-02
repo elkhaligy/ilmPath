@@ -1,0 +1,10 @@
+@IlmPath.Api_HostAddress = https://localhost:7142
+
+GET {{IlmPath.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
+
+GET {{IlmPath.Api_HostAddress}}/weatherforecast
+
+###
