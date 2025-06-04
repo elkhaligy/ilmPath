@@ -3,11 +3,18 @@
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
+    <ImplicitUsings>disable</ImplicitUsings>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Swashbuckle.AspNetCore" Version="8.1.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\IlmPath.Application\IlmPath.Application.csproj" />
+    <!-- This reference is just to access the DI classes in the infrastructure project -->
+    <ProjectReference Include="..\IlmPath.Infrastructure\IlmPath.Infrastructure.csproj" /> 
+
   </ItemGroup>
 
 </Project>

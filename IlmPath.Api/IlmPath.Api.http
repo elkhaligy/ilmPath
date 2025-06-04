@@ -1,10 +1,18 @@
-@IlmPath.Api_HostAddress = https://localhost:7142
+// http request for lecture
+GET http://localhost:5279/api/lectures
 
-GET {{IlmPath.Api_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###
-
-GET {{IlmPath.Api_HostAddress}}/weatherforecast
 
 ###
+// http request for create lecture
+// string Title, string Description, string VideoUrl, string ImageUrl, string AuthorId)
+
+POST http://localhost:5279/api/lectures
+Content-Type: application/json
+
+{
+    "Title": "Test Lecture",
+    "Description": "Test Description",
+    "VideoUrl": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+    "ImageUrl": "https://via.placeholder.com/150",
+    "AuthorId": "1"
+}
