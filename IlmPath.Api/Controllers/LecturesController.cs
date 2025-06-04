@@ -3,6 +3,7 @@ using IlmPath.Application.Lectures.Commands.CreateLecture;
 using MediatR;
 using System;
 using System.Threading.Tasks;
+using FluentResults;
 
 namespace IlmPath.Api.Controllers;
 
@@ -26,7 +27,11 @@ public class LecturesController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> CreateLecture(CreateLectureCommand command)
     {
-        Guid id = await _mediator.Send(command);
-        return Ok(id);
+        var result = await _mediator.Send(command);
+        if (result.IsFailed)
+        {
+            return BadRequest(result.Errors);
+        }
+        return Ok(result.Value);
     }
 }

@@ -1,11 +1,11 @@
 using MediatR;
-
+using FluentResults;
 namespace IlmPath.Application.Lectures.Commands.CreateLecture;
 
-public class CreateLectureCommandHandler : IRequestHandler<CreateLectureCommand, Guid>
+public class CreateLectureCommandHandler : IRequestHandler<CreateLectureCommand, Result<Guid>>
 {
-    public Task<Guid> Handle(CreateLectureCommand request, CancellationToken cancellationToken)
+    public Task<Result<Guid>> Handle(CreateLectureCommand request, CancellationToken cancellationToken)
     {
-        return Task.FromResult(Guid.NewGuid());
+        return Task.FromResult(Result.Ok(Guid.NewGuid()));
     }
 }
