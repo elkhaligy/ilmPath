@@ -16,6 +16,7 @@ public class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddApplication();
         builder.Services.AddInfrastructure(builder.Configuration);
+        builder.Services.AddAutoMapper(typeof(Program).Assembly);
 
         var app = builder.Build();
 
