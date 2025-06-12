@@ -1,3 +1,4 @@
+using IlmPath.Api.Mappings;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IlmPath.Application;
@@ -10,6 +11,7 @@ public static class DependencyInjection
         {
             options.RegisterServicesFromAssemblyContaining(typeof(DependencyInjection));
         });
+        services.AddAutoMapper(typeof(DependencyInjection).Assembly);
         return services;
     }
 }

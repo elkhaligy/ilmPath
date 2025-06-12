@@ -1,16 +1,16 @@
 using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using System.Threading.Tasks;
-using AutoMapper;
 using System.Collections.Generic;
-using IlmPath.Api.DTOs.Categories.Responses;
 using IlmPath.Application.Categories.Queries.GetAllCategories;
 using IlmPath.Application.Categories.Queries.GetCategoryById;
 using IlmPath.Application.Categories.Queries.GetCategoryBySlug;
-using IlmPath.Api.DTOs.Categories.Requests;
 using IlmPath.Application.Categories.Commands.UpdateCategory;
 using IlmPath.Application.Categories.Commands.DeleteCategory;
 using IlmPath.Application.Categories.Commands.CreateCategory;
+using AutoMapper;
+using IlmPath.Application.Categories.DTOs.Requests;
+using IlmPath.Application.Categories.DTOs.Responses;
 
 namespace IlmPath.Api.Controllers;
 
@@ -42,7 +42,7 @@ public class CategoriesController : ControllerBase
     {
         var query = new GetAllCategoriesQuery();
         var categories = await _mediator.Send(query);
-        return Ok(_mapper.Map<IEnumerable<CategoryResponse>>(categories));
+        return Ok(_mapper.Map<List<CategoryResponse>>(categories));
     }
 
     // GET: api/categories/{id}
@@ -76,10 +76,11 @@ public class CategoriesController : ControllerBase
     public async Task<ActionResult<CategoryResponse>> Create(CreateCategoryRequest request)
     {
         var command = _mapper.Map<CreateCategoryCommand>(request);
+
         var category = await _mediator.Send(command);
-        var response = _mapper.Map<CategoryResponse>(category);
-        
-        return CreatedAtAction(nameof(GetById), new { id = response.Id }, response);
+        var categoryResponse = _mapper.Map<CategoryResponse>(category);
+
+        return CreatedAtAction(nameof(GetById), new { id = categoryResponse.Id }, categoryResponse);
     }
 
 
@@ -87,7 +88,8 @@ public class CategoriesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<CategoryResponse>> Update(int id, UpdateCategoryRequest request)
     {
-        var command = _mapper.Map<UpdateCategoryCommand>((request, id));
+        var command = _mapper.Map<UpdateCategoryCommand>((request,id));
+
         var category = await _mediator.Send(command);
         
         if (category == null)

@@ -2,6 +2,7 @@ using MediatR;
 using IlmPath.Domain.Entities;
 using IlmPath.Application.Common.Interfaces;
 
+
 namespace IlmPath.Application.Categories.Queries.GetAllCategories;
 
 public class GetAllCategoriesQueryHandler : IRequestHandler<GetAllCategoriesQuery, List<Category>>
@@ -15,6 +16,6 @@ public class GetAllCategoriesQueryHandler : IRequestHandler<GetAllCategoriesQuer
 
     public async Task<List<Category>> Handle(GetAllCategoriesQuery request, CancellationToken cancellationToken)
     {
-        return await _categoriesRepository.GetAllCategoriesAsync();
+      return await _categoriesRepository.GetAllCategoriesAsync();
     }
 } 

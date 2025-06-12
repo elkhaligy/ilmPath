@@ -1,4 +1,4 @@
-namespace IlmPath.Api.DTOs.Categories.Responses;
+namespace IlmPath.Application.Categories.DTOs.Responses;
 public class CategoryResponse
 {
     public int Id { get; set; }
