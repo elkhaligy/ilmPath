@@ -40,7 +40,8 @@ public class CategoriesController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<CategoryResponse>>> GetAll()
     {
-        var categories = await _mediator.Send(new GetAllCategoriesQuery());
+        var query = new GetAllCategoriesQuery();
+        var categories = await _mediator.Send(query);
         return Ok(_mapper.Map<List<CategoryResponse>>(categories));
     }
 
@@ -48,7 +49,8 @@ public class CategoriesController : ControllerBase
     [HttpGet("{id}")]
     public async Task<ActionResult<CategoryResponse>> GetById(int id)
     {
-        var category = await _mediator.Send(new GetCategoryByIdQuery(id));
+        var query = new GetCategoryByIdQuery(id);
+        var category = await _mediator.Send(query);
         
         if (category == null)
             return NotFound();
@@ -60,7 +62,8 @@ public class CategoriesController : ControllerBase
     [HttpGet("by-slug/{slug}")]
     public async Task<ActionResult<CategoryResponse>> GetBySlug(string slug)
     {
-        var category = await _mediator.Send(new GetCategoryBySlugQuery(slug));
+        var query = new GetCategoryBySlugQuery(slug);
+        var category = await _mediator.Send(query);
         
         if (category == null)
             return NotFound();
