@@ -1,20 +1,16 @@
 using MediatR;
 using IlmPath.Domain.Entities;
 using IlmPath.Application.Common.Interfaces;
-using IlmPath.Application.DTOs.Categories.Responses;
-using AutoMapper;
 
 namespace IlmPath.Application.Categories.Queries.GetCategoryBySlug;
 
 public class GetCategoryBySlugQueryHandler : IRequestHandler<GetCategoryBySlugQuery, Category>
 {
     private readonly ICategoriesRepository _categoriesRepository;
-    private readonly IMapper _mapper;
 
-    public GetCategoryBySlugQueryHandler(ICategoriesRepository categoriesRepository, IMapper mapper)
+    public GetCategoryBySlugQueryHandler(ICategoriesRepository categoriesRepository)
     {
         _categoriesRepository = categoriesRepository;
-        _mapper = mapper;
     }
 
     public async Task<Category> Handle(GetCategoryBySlugQuery request, CancellationToken cancellationToken)

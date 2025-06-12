@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace IlmPath.Application.DTOs.Categories.Requests;
-public class UpdateCategoryRequest
+namespace IlmPath.Application.Categories.DTOs.Requests;
+public class CreateCategoryRequest
 {
     [Required]
     [StringLength(100)]

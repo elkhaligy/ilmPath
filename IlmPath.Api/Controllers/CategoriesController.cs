@@ -2,15 +2,15 @@ using Microsoft.AspNetCore.Mvc;
 using MediatR;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using IlmPath.Application.DTOs.Categories.Responses;
 using IlmPath.Application.Categories.Queries.GetAllCategories;
 using IlmPath.Application.Categories.Queries.GetCategoryById;
 using IlmPath.Application.Categories.Queries.GetCategoryBySlug;
-using IlmPath.Application.DTOs.Categories.Requests;
 using IlmPath.Application.Categories.Commands.UpdateCategory;
 using IlmPath.Application.Categories.Commands.DeleteCategory;
 using IlmPath.Application.Categories.Commands.CreateCategory;
 using AutoMapper;
+using IlmPath.Application.Categories.DTOs.Requests;
+using IlmPath.Application.Categories.DTOs.Responses;
 
 namespace IlmPath.Api.Controllers;
 
@@ -28,12 +28,12 @@ namespace IlmPath.Api.Controllers;
 public class CategoriesController : ControllerBase
 {
     private readonly IMediator _mediator;
-    private readonly IMapper mapper;
+    private readonly IMapper _mapper;
 
     public CategoriesController(IMediator mediator, IMapper mapper)
     {
         _mediator = mediator;
-        this.mapper = mapper;
+        _mapper = mapper;
     }
 
     // GET: api/categories
@@ -41,7 +41,7 @@ public class CategoriesController : ControllerBase
     public async Task<ActionResult<IEnumerable<CategoryResponse>>> GetAll()
     {
         var categories = await _mediator.Send(new GetAllCategoriesQuery());
-        return Ok(mapper.Map<List<CategoryResponse>>(categories));
+        return Ok(_mapper.Map<List<CategoryResponse>>(categories));
     }
 
     // GET: api/categories/{id}
@@ -53,7 +53,7 @@ public class CategoriesController : ControllerBase
         if (category == null)
             return NotFound();
 
-        return Ok(mapper.Map<CategoryResponse>(category));
+        return Ok(_mapper.Map<CategoryResponse>(category));
     }
 
     // GET: api/categories/by-slug/{slug}
@@ -65,17 +65,17 @@ public class CategoriesController : ControllerBase
         if (category == null)
             return NotFound();
 
-        return Ok(mapper.Map<CategoryResponse>(category));
+        return Ok(_mapper.Map<CategoryResponse>(category));
     }
 
     // POST: api/categories
     [HttpPost]
     public async Task<ActionResult<CategoryResponse>> Create(CreateCategoryRequest request)
     {
-        var command = mapper.Map<CreateCategoryCommand>(request);
+        var command = _mapper.Map<CreateCategoryCommand>(request);
 
         var category = await _mediator.Send(command);
-        var categoryResponse = mapper.Map<CategoryResponse>(category);
+        var categoryResponse = _mapper.Map<CategoryResponse>(category);
 
         return CreatedAtAction(nameof(GetById), new { id = categoryResponse.Id }, categoryResponse);
     }
@@ -85,14 +85,14 @@ public class CategoriesController : ControllerBase
     [HttpPut("{id}")]
     public async Task<ActionResult<CategoryResponse>> Update(int id, UpdateCategoryRequest request)
     {
-        var command = mapper.Map<UpdateCategoryCommand>((request,id));
+        var command = _mapper.Map<UpdateCategoryCommand>((request,id));
 
         var category = await _mediator.Send(command);
         
         if (category == null)
             return NotFound();
 
-        return Ok(mapper.Map<CategoryResponse>(category));
+        return Ok(_mapper.Map<CategoryResponse>(category));
     }
 
     // DELETE: api/categories/{id}

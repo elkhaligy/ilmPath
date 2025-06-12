@@ -1,9 +1,9 @@
 using AutoMapper;
-using IlmPath.Application.DTOs.Categories.Requests;
-using IlmPath.Application.DTOs.Categories.Responses;
 using IlmPath.Application.Categories.Commands.UpdateCategory;
 using IlmPath.Domain.Entities;
 using IlmPath.Application.Categories.Commands.CreateCategory;
+using IlmPath.Application.Categories.DTOs.Requests;
+using IlmPath.Application.Categories.DTOs.Responses;
 
 namespace IlmPath.Api.Mappings;
 

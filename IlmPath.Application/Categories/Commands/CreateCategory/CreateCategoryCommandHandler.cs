@@ -1,7 +1,7 @@
 using MediatR;
 using IlmPath.Domain.Entities;
 using IlmPath.Application.Common.Interfaces;
-using IlmPath.Application.DTOs.Categories.Responses;
+using IlmPath.Application.Categories.DTOs.Responses;
 using AutoMapper;
 
 namespace IlmPath.Application.Categories.Commands.CreateCategory;
@@ -9,21 +9,21 @@ namespace IlmPath.Application.Categories.Commands.CreateCategory;
 public class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, Category>
 {
     private readonly ICategoriesRepository _categoriesRepository;
-    private readonly IMapper mapper;
+    private readonly IMapper _mapper;
 
     public CreateCategoryCommandHandler(ICategoriesRepository categoriesRepository, IMapper mapper)
     {
         _categoriesRepository = categoriesRepository;
-        this.mapper = mapper;
+        _mapper = mapper;
     }
     public async Task<Category> Handle(CreateCategoryCommand request, CancellationToken cancellationToken)
     {
-        // Create lecture
-        var category = mapper.Map<Category>(request);
+        // Create category
+        var category = _mapper.Map<Category>(request);
 
         // Add it to the db
         await _categoriesRepository.AddCategoryAsync(category);
-        // Return lecture
+        // Return category
 
         return category;
     }
