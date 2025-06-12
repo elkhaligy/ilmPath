@@ -1,6 +1,6 @@
 using AutoMapper;
-using IlmPath.Api.DTOs.Categories.Requests;
-using IlmPath.Api.DTOs.Categories.Responses;
+using IlmPath.Application.DTOs.Categories.Requests;
+using IlmPath.Application.DTOs.Categories.Responses;
 using IlmPath.Application.Categories.Commands.UpdateCategory;
 using IlmPath.Domain.Entities;
 using IlmPath.Application.Categories.Commands.CreateCategory;
@@ -13,6 +13,8 @@ public class CategoryMappings : Profile
     {
         // Domain to Response DTO
         CreateMap<Category, CategoryResponse>();
+        CreateMap<CreateCategoryCommand, Category>();
+
 
         // Request DTO to Command
         CreateMap<CreateCategoryRequest, CreateCategoryCommand>();
