@@ -1,9 +1,8 @@
 ﻿using AutoMapper;
-using IlmPath.Application.Categories.Commands.CreateCategory;
-using IlmPath.Application.Categories.Commands.UpdateCategory;
-using IlmPath.Application.Categories.DTOs.Requests;
-using IlmPath.Application.Categories.DTOs.Responses;
 using IlmPath.Application.Enrollments.Commands.CreateEnrollment;
+using IlmPath.Application.Enrollments.Commands.UpdateEnrollment;
+using IlmPath.Application.Enrollments.DTOs.Requests;
+using IlmPath.Application.Enrollments.DTOs.Responses;
 using IlmPath.Domain.Entities;
 using System;
 using System.Collections.Generic;
@@ -18,16 +17,16 @@ namespace IlmPath.Application.Mappings
         public EnrollmentMappings()
         {
             // Domain to Response DTO
-            //CreateMap<Category, CategoryResponse>();
+            CreateMap<Enrollment, EnrollmentResponse>();
             CreateMap<CreateEnrollmentCommand, Enrollment>();
 
 
             // Request DTO to Command
-            //CreateMap<CreateCategoryRequest, CreateCategoryCommand>();
+            CreateMap<CreateEnrollmentRequest, CreateEnrollmentCommand>();
 
             // For UpdateCategoryCommand, we need to handle the Id parameter
-            CreateMap<(UpdateCategoryRequest Request, int Id), UpdateCategoryCommand>()
-                .ConstructUsing(src => new UpdateCategoryCommand(src.Id, src.Request.Name, src.Request.Slug));
+            CreateMap<(UpdateEnrollmentRequest Request, int Id), UpdateEnrollmentCommand>()
+                .ConstructUsing(src => new UpdateEnrollmentCommand(src.Id, src.Request.EnrollmentDate, src.Request.PricePaid));
         }
     }
 }

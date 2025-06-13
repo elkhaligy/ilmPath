@@ -36,9 +36,18 @@ namespace IlmPath.Infrastructure.Enrollments.presistance
 
         }
 
-        public async Task<List<Enrollment>> GetAllEnrollmentsAsync()
+        public async Task<(IEnumerable<Enrollment> enrollments, int TotalCount)> GetAllEnrollmentsAsync(int pageNumber, int pageSize)
         {
-            return await _context.Enrollments.ToListAsync();
+            var totalCount = await _context.Enrollments.CountAsync();
+
+            var enrollments = await _context.Enrollments
+            .Include(e => e.User)
+            .Include(e => e.OrderDetails)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+            return (enrollments, totalCount);
         }
 
         public async Task<Enrollment?> GetEnrollmentByIdAsync(int id)

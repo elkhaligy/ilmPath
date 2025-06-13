@@ -10,7 +10,7 @@ namespace IlmPath.Application.Common.Interfaces
     public interface IEnrollmentRepository
     {
         Task<Enrollment?> GetEnrollmentByIdAsync(int id);
-        Task<List<Enrollment>> GetAllEnrollmentsAsync();
+        Task<(IEnumerable<Enrollment> enrollments, int TotalCount)> GetAllEnrollmentsAsync(int pageNumber, int pageSize);
         Task AddEnrollmentAsync(Enrollment enrollment);
         Task UpdateEnrollmentAsync(Enrollment enrollment);
         Task DeleteEnrollmentAsync(int id);

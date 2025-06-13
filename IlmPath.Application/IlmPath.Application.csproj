@@ -18,10 +18,6 @@
   <ItemGroup>
     <Folder Include="Enrollments\Commands\DeleteEnrollment\" />
     <Folder Include="Enrollments\Commands\UpdateEnrollment\" />
-    <Folder Include="Enrollments\DTOs\Responses\" />
-    <Folder Include="Enrollments\DTOs\Requests\" />
-    <Folder Include="Enrollments\Queries\GetAllEnrollments\" />
-    <Folder Include="Enrollments\Queries\GetEnrollmentById\" />
   </ItemGroup>
 
   <PropertyGroup>
