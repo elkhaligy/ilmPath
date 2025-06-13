@@ -10,6 +10,7 @@ public class IdentitySeeder
     private readonly UserManager<ApplicationUser> _userManager;
     private readonly RoleManager<IdentityRole> _roleManager;
 
+
     public IdentitySeeder(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
     {
         _userManager = userManager;
@@ -18,8 +19,9 @@ public class IdentitySeeder
 
     public async Task SeedAsync()
     {
-        
 
+        if (await _userManager.Users.AnyAsync()) return;
+        
         await SeedRolesAsync();
         await SeedUsersAsync();
     }

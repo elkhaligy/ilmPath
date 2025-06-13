@@ -1,4 +1,5 @@
 ﻿using IlmPath.Infrastructure.Data;
+using IlmPath.Infrastructure.Seed;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -22,7 +23,13 @@ namespace IlmPath.Infrastructure.UpdateDatabaseIntializerEx
                 try
                 {
                     var dbContext = services.GetRequiredService<ApplicationDbContext>();
+                    var IdentitySeeder = services.GetRequiredService<IdentitySeeder>();
+                    var dataSeeder = services.GetRequiredService<DataSeeder>();
+
                     await dbContext.Database.MigrateAsync();
+                    await IdentitySeeder.SeedAsync();
+                    await dataSeeder.SeedAsync();
+
                 }
                 catch (Exception ex)
                 {
