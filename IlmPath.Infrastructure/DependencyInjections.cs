@@ -6,6 +6,7 @@ using IlmPath.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using IlmPath.Application.Common.Interfaces;
 using IlmPath.Infrastructure.Categories.Persistance;
+using IlmPath.Infrastructure.Courses.Presistance;
 
 namespace IlmPath.Infrastructure;
 
@@ -17,6 +18,7 @@ public static class DependencyInjection
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
         services.AddIdentity<ApplicationUser, IdentityRole>().AddEntityFrameworkStores<ApplicationDbContext>();
         services.AddScoped<ICategoriesRepository, CategoriesRepository>();
+        services.AddScoped<ICourseRepository,CourseRepository>();
         return services;
     }
 }
