@@ -19,7 +19,7 @@ public class Program
         // --- Service Configuration ---
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
-
+        
         // AddSwaggerGen registers the Swagger generator, defining one or more Swagger documents.
         builder.Services.AddSwaggerGen(options =>
         {
@@ -30,8 +30,8 @@ public class Program
             });
         });
 
-        builder.Services.AddApplication();
         builder.Services.AddInfrastructure(builder.Configuration);
+        builder.Services.AddApplication();
 
         var app = builder.Build();
 
@@ -59,6 +59,7 @@ public class Program
         app.UseHttpsRedirection();
         app.UseMiddleware<ExceptionHandlerMiddleware>();
 
+        app.UseAuthentication();
         app.UseAuthorization();
         app.MapControllers();
 

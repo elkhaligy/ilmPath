@@ -60,6 +60,16 @@ namespace IlmPath.Api.Middleware
                     };
                     break;
 
+                case UnauthorizedAccessException unauthorizedAccessException:
+                    statusCode = HttpStatusCode.Unauthorized;
+                    problemDetails = new ProblemDetails
+                    {
+                        Title = "Couldn't Login",
+                        Status = (int)statusCode,
+                        Detail = unauthorizedAccessException.Message
+                    };
+                    break;
+
                 // You can add more custom exception cases here
                 // case BadRequestException badRequestException:
                 //     ...
