@@ -1,11 +1,12 @@
+
+using IlmPath.Api.Middleware;
 using IlmPath.Application;
 using IlmPath.Infrastructure;
-using IlmPath.Infrastructure.Seed;
+using IlmPath.Infrastructure.UpdateDatabaseIntializerEx;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
+
 using System.Threading.Tasks;
 
 namespace IlmPath.Api;
@@ -15,42 +16,51 @@ public class Program
     {
         var builder = WebApplication.CreateBuilder(args);
 
+        // --- Service Configuration ---
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+
+        // AddSwaggerGen registers the Swagger generator, defining one or more Swagger documents.
+        builder.Services.AddSwaggerGen(options =>
+        {
+            options.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo
+            {
+                Title = "iLmPath API",
+                Version = "v1"
+            });
+        });
+
         builder.Services.AddApplication();
         builder.Services.AddInfrastructure(builder.Configuration);
+
         var app = builder.Build();
 
-        using (var scope = app.Services.CreateScope())
-        {
-            var services = scope.ServiceProvider;
-            try
-            {
-                var dataSeeder = services.GetRequiredService<DataSeeder>();
-                var identitySeeder = services.GetRequiredService<IdentitySeeder>();
-                await identitySeeder.SeedAsync();
-                await dataSeeder.SeedAsync();
-            }
-            catch (Exception ex)
-            {
-                var logger = services.GetRequiredService<ILogger<Program>>();
-                logger.LogError(ex, "An error occurred during database seeding.");
-            }
-        }
+        // --- Configure the HTTP request pipeline. ---
 
-        // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
-            app.UseSwaggerUI();
+
+            // This is where you configure the Swagger UI
+            app.UseSwaggerUI(options =>
+            {
+                // 3lshan n test bl old swagger api
+                options.SwaggerEndpoint("/swagger/v1/swagger.json", "iLmPath API V1");
+
+                options.RoutePrefix = string.Empty;
+            });
+
+            // 3lshan t update el data base 3ala a5er migration badl ma n3mlha manual   
+
+            await app.UseDatabaseMigrations();
+
         }
 
         app.UseHttpsRedirection();
+        app.UseMiddleware<ExceptionHandlerMiddleware>();
+
         app.UseAuthorization();
         app.MapControllers();
-
-
 
         app.Run();
     }

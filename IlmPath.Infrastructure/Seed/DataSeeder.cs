@@ -21,13 +21,17 @@ public class DataSeeder
     {
         await _context.Database.MigrateAsync();
 
-        var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync();
 
-        await SeedCategoriesAsync();
-        await _context.SaveChangesAsync();
+        if (await _context.Categories.AnyAsync()) return;
+
+
+        var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync();
 
         if (user != null)
         {
+            await SeedCategoriesAsync();
+            await _context.SaveChangesAsync();
+
             await SeedCoursesAsync(user.Id);
             await _context.SaveChangesAsync();
 

@@ -1,13 +1,13 @@
 using IlmPath.Application.Common.Interfaces;
 using IlmPath.Domain.Entities;
 using IlmPath.Infrastructure.Categories.Persistance;
+using IlmPath.Infrastructure.Courses.Presistance;
 using IlmPath.Infrastructure.Data;
 using IlmPath.Infrastructure.Seed;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-
 namespace IlmPath.Infrastructure;
 
 public static class DependencyInjection
@@ -20,6 +20,8 @@ public static class DependencyInjection
         services.AddScoped<ICategoriesRepository, CategoriesRepository>();
         services.AddScoped<DataSeeder>();
         services.AddScoped<IdentitySeeder>();
+        services.AddScoped<ICourseRepository,CourseRepository>();
+
         return services;
     }
 }
