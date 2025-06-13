@@ -10,6 +10,7 @@ public class ApplicationUser : IdentityUser
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? LastModifiedAt { get; set; }
     public bool IsActive { get; set; } = true;
+    public string? ProfileImageUrl { get; set; } 
 
     // Navigation properties
     public virtual Cart? Cart { get; set; }
