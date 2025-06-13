@@ -1,3 +1,4 @@
+
 using IlmPath.Api.Middleware;
 using IlmPath.Application;
 using IlmPath.Infrastructure;
@@ -5,6 +6,7 @@ using IlmPath.Infrastructure.UpdateDatabaseIntializerEx;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+
 using System.Threading.Tasks;
 
 namespace IlmPath.Api;
@@ -34,6 +36,7 @@ public class Program
         var app = builder.Build();
 
         // --- Configure the HTTP request pipeline. ---
+
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
