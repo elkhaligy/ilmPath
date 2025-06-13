@@ -56,6 +56,7 @@ public class Program
 
         }
 
+        app.UseStaticFiles();
         app.UseHttpsRedirection();
         app.UseMiddleware<ExceptionHandlerMiddleware>();
 
