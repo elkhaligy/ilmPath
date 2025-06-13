@@ -36,11 +36,7 @@ public class UsersController : ControllerBase
     [HttpPost("{userId}/profile-image")]
     public async Task<IActionResult> UpdateProfileImage(string userId, IFormFile profileImage)
     {
-        if (profileImage == null || profileImage.Length == 0)
-        {
-            return BadRequest("Image file is required.");
-        }
-
+        
         var command = new UpdateProfileImageCommand
         {
             UserId = userId,
