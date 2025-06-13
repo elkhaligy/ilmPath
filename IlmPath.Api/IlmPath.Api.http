@@ -1,1 +1,11 @@
-﻿
+﻿@IlmPath.Api_HostAddress = https://localhost:7142
+
+POST {{IlmPath.Api_HostAddress}}/api/users/login
+Content-Type: application/json
+
+{
+  "email": "admin@ilmpath.com",
+  "password": "Admin@123"
+}
+
+###
