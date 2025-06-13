@@ -1,4 +1,5 @@
 
+using IlmPath.Application.Users.Commands;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
@@ -23,5 +24,11 @@ public class UsersController : ControllerBase
         var result = await _mediator.Send(command);
 
         return Ok(result);
+    }
+    [HttpPost("register")]
+    public async Task<IActionResult> Register([FromBody] RegisterUserCommand command)
+    {
+        var result = await _mediator.Send(command);
+        return Ok(new { UserId = result });
     }
 } 
