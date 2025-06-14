@@ -3,7 +3,7 @@ using IlmPath.Domain.Entities;
 using IlmPath.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
-namespace IlmPath.Infrastructure.Categories.Persistance;
+namespace IlmPath.Infrastructure.Categories.Persistence;
 
 
 public class CategoriesRepository : ICategoriesRepository

@@ -3,13 +3,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Azure.Core;
+using IlmPath.Application.Common.Exceptions;
 using IlmPath.Application.Common.Interfaces;
 using IlmPath.Domain.Entities;
 using IlmPath.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
 
-namespace IlmPath.Infrastructure.Enrollments.presistance
+namespace IlmPath.Infrastructure.Enrollments.Persistence
 {
     class EnrollmentRepository : IEnrollmentRepository
     {
@@ -29,7 +31,7 @@ namespace IlmPath.Infrastructure.Enrollments.presistance
         {
            var enrollment=  await _context.Enrollments.FindAsync(id);
             if(enrollment == null)
-                throw new Exception("Category not found");
+                throw new NotFoundException(nameof(Enrollment),id);
 
             _context.Enrollments.Remove(enrollment);
             await _context.SaveChangesAsync();
@@ -52,14 +54,16 @@ namespace IlmPath.Infrastructure.Enrollments.presistance
 
         public async Task<Enrollment?> GetEnrollmentByIdAsync(int id)
         {
-          return  await _context.Enrollments.FindAsync(id);
+            return await _context.Enrollments
+            .Include(e => e.OrderDetails)
+            .FirstOrDefaultAsync(i => i.Id == id);
         }
 
         public async Task UpdateEnrollmentAsync(Enrollment enrollment)
         {
             var existingEnrollment = await _context.Enrollments.FindAsync(enrollment.Id);
             if (existingEnrollment == null)
-                throw new Exception("Category not found");
+                throw new NotFoundException(nameof(Enrollment), enrollment.Id);
 
             existingEnrollment.EnrollmentDate = enrollment.EnrollmentDate;
             existingEnrollment.PricePaid= enrollment.PricePaid;
