@@ -1,5 +1,4 @@
 ﻿using IlmPath.Application.Common.Interfaces;
-using IlmPath.Application.Enrollments.Commands.DeleteEnrollment;
 using MediatR;
 using System;
 using System.Collections.Generic;

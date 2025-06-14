@@ -1,20 +1,22 @@
-using System.ComponentModel.DataAnnotations;
+﻿using IlmPath.Domain.Entities;
+using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace IlmPath.Domain.Entities;
+namespace IlmPath.Application.InvoiceItems.DTOs.Requests;
 
-public class InvoiceItem
+public class CreateInvoiceItemRequest
 {
-    [Key]
-    public int Id { get; set; } 
 
     [Required]
     public int InvoiceId { get; set; } // FK to Invoice
-    public virtual Invoice? Invoice { get; set; }
 
     [Required]
     public int CourseId { get; set; } // FK to Course
-    public virtual Course? Course { get; set; }
 
     [Required]
     [StringLength(255)]
