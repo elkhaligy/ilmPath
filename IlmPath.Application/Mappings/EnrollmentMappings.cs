@@ -10,23 +10,24 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IlmPath.Application.Mappings
+namespace IlmPath.Application.Mappings;
+class EnrollmentMappings : Profile
 {
-    class EnrollmentMappings : Profile
+    public EnrollmentMappings()
     {
-        public EnrollmentMappings()
-        {
-            // Domain to Response DTO
-            CreateMap<Enrollment, EnrollmentResponse>();
-            CreateMap<CreateEnrollmentCommand, Enrollment>();
+
+        // Domain to Response DTO
+        CreateMap<Enrollment, EnrollmentResponse>();
+        CreateMap<CreateEnrollmentCommand, Enrollment>();
+        CreateMap<UpdateEnrollmentCommand, Enrollment>();
 
 
-            // Request DTO to Command
-            CreateMap<CreateEnrollmentRequest, CreateEnrollmentCommand>();
+        // Request DTO to Command
+        CreateMap<CreateEnrollmentRequest, CreateEnrollmentCommand>();
 
-            // For UpdateCategoryCommand, we need to handle the Id parameter
-            CreateMap<(UpdateEnrollmentRequest Request, int Id), UpdateEnrollmentCommand>()
-                .ConstructUsing(src => new UpdateEnrollmentCommand(src.Id, src.Request.EnrollmentDate, src.Request.PricePaid));
-        }
+
+    // For UpdateCategoryCommand, we need to handle the Id parameter
+    CreateMap<(UpdateEnrollmentRequest Request, int Id), UpdateEnrollmentCommand>()
+        .ConstructUsing(src => new UpdateEnrollmentCommand(src.Id,src.Request.UserId, src.Request.CourseId, src.Request.EnrollmentDate, src.Request.PricePaid));
     }
 }

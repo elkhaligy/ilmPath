@@ -63,6 +63,10 @@ namespace IlmPath.Infrastructure.Enrollments.presistance
 
             existingEnrollment.EnrollmentDate = enrollment.EnrollmentDate;
             existingEnrollment.PricePaid= enrollment.PricePaid;
+            existingEnrollment.UserId = enrollment.UserId;
+            existingEnrollment.CourseId = enrollment.CourseId;
+
+
             await _context.SaveChangesAsync();
         }
     }
