@@ -1,9 +1,10 @@
 using IlmPath.Application.Common.Interfaces;
 using IlmPath.Domain.Entities;
-using IlmPath.Infrastructure.Categories.Persistance;
-using IlmPath.Infrastructure.Courses.Presistance;
+using IlmPath.Infrastructure.Categories.Persistence;
+using IlmPath.Infrastructure.Courses.Persistence;
 using IlmPath.Infrastructure.Data;
-using IlmPath.Infrastructure.Enrollments.presistance;
+using IlmPath.Infrastructure.Enrollments.Persistence;
+using IlmPath.Infrastructure.Invoices.Persistence;
 using IlmPath.Infrastructure.Seed;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -51,6 +52,8 @@ public static class DependencyInjection
         services.AddScoped<IdentitySeeder>();
         services.AddScoped<ICourseRepository,CourseRepository>();
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+        services.AddScoped<IInvoiceRepository, InvoiceRepository>();
+
 
 
         return services;

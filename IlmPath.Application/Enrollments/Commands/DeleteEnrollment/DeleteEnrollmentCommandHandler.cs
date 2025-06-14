@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 
 namespace IlmPath.Application.Enrollments.Commands.DeleteEnrollment;
 
-
 public class DeleteEnrollmentCommandHandler : IRequestHandler<DeleteEnrollmentCommand, bool>
 {
     private readonly IEnrollmentRepository _enrollmentRepository;

@@ -11,6 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace IlmPath.Application.Mappings;
+
 class EnrollmentMappings : Profile
 {
     public EnrollmentMappings()
@@ -18,9 +19,10 @@ class EnrollmentMappings : Profile
 
         // Domain to Response DTO
         CreateMap<Enrollment, EnrollmentResponse>();
+
+        // Command to Domain
         CreateMap<CreateEnrollmentCommand, Enrollment>();
         CreateMap<UpdateEnrollmentCommand, Enrollment>();
-
 
         // Request DTO to Command
         CreateMap<CreateEnrollmentRequest, CreateEnrollmentCommand>();

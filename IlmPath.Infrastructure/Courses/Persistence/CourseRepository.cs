@@ -10,7 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace IlmPath.Infrastructure.Courses.Presistance
+namespace IlmPath.Infrastructure.Courses.Persistence
 {
     public class CourseRepository(ApplicationDbContext _context) : ICourseRepository
     {
