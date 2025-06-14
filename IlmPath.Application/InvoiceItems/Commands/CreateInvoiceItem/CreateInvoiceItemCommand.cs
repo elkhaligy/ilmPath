@@ -9,4 +9,4 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace IlmPath.Application.InvoiceItems.Commands.CreateInvoiceItem;
-public record CreateInvoiceItemCommand(int InvoiceId, int CourseId, string Description, int Quantity, decimal UnitPrice, decimal OriginalUnitPrice, decimal DiscountAppliedOnItem, decimal LineTotal) : IRequest<InvoiceItem>;
+public record CreateInvoiceItemCommand(int InvoiceId, int CourseId, string Description,  decimal OriginalUnitPrice, decimal DiscountAppliedOnItem, decimal UnitPrice) : IRequest<InvoiceItem>;

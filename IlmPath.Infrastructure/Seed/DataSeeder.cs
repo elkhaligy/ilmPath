@@ -293,11 +293,9 @@ public class DataSeeder
                 InvoiceId = invoice.Id,
                 CourseId = orderDetail.Course.Id,
                 Description = orderDetail.Course.Title,
-                Quantity = 1,
-                UnitPrice = orderDetail.PriceAtPurchase,
                 OriginalUnitPrice = orderDetail.Course.Price,
                 DiscountAppliedOnItem = orderDetail.Course.Price - orderDetail.PriceAtPurchase,
-                LineTotal = orderDetail.PriceAtPurchase
+                UnitPrice = orderDetail.PriceAtPurchase,
             });
         }
         await _context.InvoiceItems.AddRangeAsync(invoiceItems);

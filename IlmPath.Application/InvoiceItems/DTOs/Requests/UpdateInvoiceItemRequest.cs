@@ -21,10 +21,6 @@ public class UpdateInvoiceItemRequest
     [Required]
     [StringLength(255)]
     public string Description { get; set; } = string.Empty; // e.g., "Enrollment in [Course Title]"
-    public int Quantity { get; set; } = 1;
-
-    [Column(TypeName = "decimal(18,2)")]
-    public decimal UnitPrice { get; set; } // Price after discount for this item
 
     [Column(TypeName = "decimal(18,2)")]
     public decimal OriginalUnitPrice { get; set; } // Price before discount
@@ -33,5 +29,6 @@ public class UpdateInvoiceItemRequest
     public decimal DiscountAppliedOnItem { get; set; }
 
     [Column(TypeName = "decimal(18,2)")]
-    public decimal LineTotal { get; set; } // Final UnitPrice * Quantity
+    public decimal UnitPrice { get; set; } // Price after discount for this item
+
 }

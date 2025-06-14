@@ -15,7 +15,6 @@ public class CreateInvoiceItemCommandHandler : IRequestHandler<CreateInvoiceItem
     private readonly IInvoiceItemRepository _invoiceItemRepository;
     private readonly IMapper _mapper;
 
-
     public CreateInvoiceItemCommandHandler(IInvoiceItemRepository invoiceItemRepository, IMapper mapper)
     {
         _invoiceItemRepository = invoiceItemRepository;

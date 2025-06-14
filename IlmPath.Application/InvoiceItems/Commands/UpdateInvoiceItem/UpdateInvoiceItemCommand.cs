@@ -8,5 +8,5 @@ using System.Threading.Tasks;
 
 namespace IlmPath.Application.InvoiceItems.Commands.UpdateInvoiceItem;
  
-public record UpdateInvoiceItemCommand(int Id, int InvoiceId, int CourseId, string Description, int Quantity, decimal UnitPrice, decimal OriginalUnitPrice, decimal DiscountAppliedOnItem, decimal LineTotal) : IRequest<InvoiceItem>;
+public record UpdateInvoiceItemCommand(int Id, int InvoiceId, int CourseId, string Description, decimal OriginalUnitPrice, decimal DiscountAppliedOnItem, decimal UnitPrice) : IRequest<InvoiceItem>;
 

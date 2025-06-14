@@ -15,11 +15,7 @@ public class InvoiceItemResponse
     public int InvoiceId { get; set; } // FK to Invoice
     public int CourseId { get; set; } // FK to Course
     public string Description { get; set; } = string.Empty; // e.g., "Enrollment in [Course Title]"
-    public int Quantity { get; set; } = 1;
-    public decimal UnitPrice { get; set; } // Price after discount for this item
-
     public decimal OriginalUnitPrice { get; set; } // Price before discount
-
     public decimal DiscountAppliedOnItem { get; set; }
-    public decimal LineTotal { get; set; } // Final UnitPrice * Quantity
+    public decimal UnitPrice { get; set; } // Price after discount for this item
 }
