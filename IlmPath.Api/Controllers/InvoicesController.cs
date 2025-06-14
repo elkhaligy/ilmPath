@@ -13,82 +13,81 @@ using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace IlmPath.Api.Controllers
+namespace IlmPath.Api.Controllers;
+
+[Route("api/[controller]")]
+[ApiController]
+public class InvoicesController : ControllerBase
 {
-    [Route("api/[controller]")]
-    [ApiController]
-    public class InvoicesController : ControllerBase
+    private readonly IMediator _mediator;
+    private readonly IMapper _mapper;
+    public InvoicesController(IMediator mediator, IMapper mapper)
     {
-        private readonly IMediator _mediator;
-        private readonly IMapper _mapper;
-        public InvoicesController(IMediator mediator, IMapper mapper)
-        {
-            _mapper = mapper;
-            _mediator = mediator;
-        }
+        _mapper = mapper;
+        _mediator = mediator;
+    }
 
-        // GET: api/invoices
-        [HttpGet]
-        public async Task<ActionResult<PagedResult<InvoiceResponse>>> GetAll([FromQuery] GetAllInvoicesQuery query)
-        {
-            var (invoices, totalCount) = await _mediator.Send(query);
-            var invoiceResponses = _mapper.Map<List<InvoiceResponse>>(invoices);
+    // GET: api/invoices
+    [HttpGet]
+    public async Task<ActionResult<PagedResult<InvoiceResponse>>> GetAll([FromQuery] GetAllInvoicesQuery query)
+    {
+        var (invoices, totalCount) = await _mediator.Send(query);
+        var invoiceResponses = _mapper.Map<List<InvoiceResponse>>(invoices);
 
-            return Ok(new PagedResult<InvoiceResponse>(invoiceResponses, totalCount, query.PageNumber, query.PageSize));
-        }
+        return Ok(new PagedResult<InvoiceResponse>(invoiceResponses, totalCount, query.PageNumber, query.PageSize));
+    }
 
-        // GET: api/invoices/{id}
-        [HttpGet("{id}")]
-        public async Task<ActionResult<InvoiceResponse>> GetById(int id)
-        {
-            var query = new GetInvoiceByIdQuery(id);
-            var invoice = await _mediator.Send(query);
+    // GET: api/invoices/{id}
+    [HttpGet("{id}")]
+    public async Task<ActionResult<InvoiceResponse>> GetById(int id)
+    {
+        var query = new GetInvoiceByIdQuery(id);
+        var invoice = await _mediator.Send(query);
 
-            if (invoice == null)
-                return NotFound();
+        if (invoice == null)
+            return NotFound();
 
-            return Ok(_mapper.Map<InvoiceResponse>(invoice));
-        }
+        return Ok(_mapper.Map<InvoiceResponse>(invoice));
+    }
 
 
-        // POST: api/invoices
-        [HttpPost]
-        public async Task<ActionResult<InvoiceResponse>> Create(CreateInvoiceRequest request)
-        {
-            var command = _mapper.Map<CreateInvoiceCommand>(request);
+    // POST: api/invoices
+    [HttpPost]
+    public async Task<ActionResult<InvoiceResponse>> Create(CreateInvoiceRequest request)
+    {
+        var command = _mapper.Map<CreateInvoiceCommand>(request);
 
-            var invoice = await _mediator.Send(command);
-            var invoiceResponse = _mapper.Map<InvoiceResponse>(invoice);
+        var invoice = await _mediator.Send(command);
+        var invoiceResponse = _mapper.Map<InvoiceResponse>(invoice);
 
-            return CreatedAtAction(nameof(GetById), new { id = invoiceResponse.Id }, invoiceResponse);
-        }
+        return CreatedAtAction(nameof(GetById), new { id = invoiceResponse.Id }, invoiceResponse);
+    }
 
 
-        // PUT: api/invoices/{id}
-        [HttpPut("{id}")]
-        public async Task<ActionResult<InvoiceResponse>> Update(int id, UpdateInvoiceRequest request)
-        {
-            var command = _mapper.Map<UpdateInvoiceCommand>((request, id));
+    // PUT: api/invoices/{id}
+    [HttpPut("{id}")]
+    public async Task<ActionResult<InvoiceResponse>> Update(int id, UpdateInvoiceRequest request)
+    {
+        var command = _mapper.Map<UpdateInvoiceCommand>((request, id));
 
-            var invoice = await _mediator.Send(command);
+        var invoice = await _mediator.Send(command);
 
-            if (invoice == null)
-                return NotFound();
+        if (invoice == null)
+            return NotFound();
 
-            return Ok(_mapper.Map<InvoiceResponse>(invoice));
-        }
+        return Ok(_mapper.Map<InvoiceResponse>(invoice));
+    }
 
-        //DELETE: api/invoices/{id}
-        [HttpDelete("{id}")]
-        public async Task<ActionResult> Delete(int id)
-        {
-            var command = new DeleteInvoiceCommand(id);
-            var result = await _mediator.Send(command);
+    //DELETE: api/invoices/{id}
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(int id)
+    {
+        var command = new DeleteInvoiceCommand(id);
+        var result = await _mediator.Send(command);
 
-            if (!result)
-                return NotFound();
+        if (!result)
+            return NotFound();
 
-            return NoContent();
-        }
+        return NoContent();
     }
 }

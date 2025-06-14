@@ -58,7 +58,7 @@ public class InvoiceItemRepository : IInvoiceItemRepository
 
     public async Task UpdateInvoiceItemAsync(InvoiceItem invoiceItem)
     {
-        var existingInvoiceItem = await _context.Invoices.FindAsync(invoiceItem.Id);
+        var existingInvoiceItem = await _context.InvoiceItems.FindAsync(invoiceItem.Id);
         if (existingInvoiceItem == null)
             throw new NotFoundException(nameof(InvoiceItem), invoiceItem.Id);
 
