@@ -18,14 +18,21 @@ class InvoiceMappings : Profile
     {
         // Domain to Response DTO
         CreateMap<Invoice, InvoiceResponse>();
-        CreateMap<CreateInvoiceCommand, Enrollment>();
+
+        //command to Domain
+        CreateMap<CreateInvoiceCommand, Invoice>();
+        CreateMap<UpdateInvoiceCommand, Invoice>();
+
+
+        // Domain to Domain for Update
+        CreateMap<Invoice, Invoice>();
 
 
         // Request DTO to Command
         CreateMap<CreateInvoiceRequest, CreateInvoiceCommand>();
 
         // For UpdateCategoryCommand, we need to handle the Id parameter
-        //CreateMap<(UpdateInvoiceRequest Request, int Id), UpdateInvoiceCommand>()
-        //    .ConstructUsing(src => new UpdateInvoiceCommand(src.Id, src.Request.EnrollmentDate, src.Request.PricePaid));
+        CreateMap<(UpdateInvoiceRequest Request, int Id), UpdateInvoiceCommand>()
+            .ConstructUsing(src => new UpdateInvoiceCommand(src.Id, src.Request.InvoiceNumber, src.Request.UserId, src.Request.PaymentId, src.Request.IssueDate, src.Request.DueDate, src.Request.TotalAmount, src.Request.BillingAddress, src.Request.Status, src.Request.Notes));
     }
 }

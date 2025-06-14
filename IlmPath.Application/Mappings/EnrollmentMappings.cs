@@ -19,6 +19,8 @@ class EnrollmentMappings : Profile
 
         // Domain to Response DTO
         CreateMap<Enrollment, EnrollmentResponse>();
+
+        // Command to Domain
         CreateMap<CreateEnrollmentCommand, Enrollment>();
         CreateMap<UpdateEnrollmentCommand, Enrollment>();
 
