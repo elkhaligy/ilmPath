@@ -14,8 +14,6 @@ public class UpdateInvoiceCommandHandler : IRequestHandler<UpdateInvoiceCommand,
 {
     private readonly IInvoiceRepository _invoiceRepository;
     private readonly IMapper _mapper;
-
-
     public UpdateInvoiceCommandHandler(IInvoiceRepository invoiceRepository, IMapper mapper)
     {
         _invoiceRepository = invoiceRepository;
