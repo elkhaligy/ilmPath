@@ -28,7 +28,7 @@ class EnrollmentMappings : Profile
         CreateMap<CreateEnrollmentRequest, CreateEnrollmentCommand>();
 
 
-    // For UpdateCategoryCommand, we need to handle the Id parameter
+    // For UpdateEnrollmentCommand, we need to handle the Id parameter
     CreateMap<(UpdateEnrollmentRequest Request, int Id), UpdateEnrollmentCommand>()
         .ConstructUsing(src => new UpdateEnrollmentCommand(src.Id,src.Request.UserId, src.Request.CourseId, src.Request.EnrollmentDate, src.Request.PricePaid));
     }

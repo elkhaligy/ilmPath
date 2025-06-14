@@ -31,7 +31,7 @@ class InvoiceItemMappings : Profile
         // Request DTO to Command
         CreateMap<CreateInvoiceItemRequest, CreateInvoiceItemCommand>();
 
-        //For UpdateCategoryCommand, we need to handle the Id parameter
+        //For UpdateInvoiceItemCommand, we need to handle the Id parameter
         CreateMap<(UpdateInvoiceItemRequest Request, int Id), UpdateInvoiceItemCommand>()
             .ConstructUsing(src => new UpdateInvoiceItemCommand(src.Id, src.Request.InvoiceId, src.Request.CourseId, src.Request.Description, src.Request.OriginalUnitPrice, src.Request.DiscountAppliedOnItem, src.Request.UnitPrice));
     }

@@ -19,7 +19,7 @@ public class CategoryMappings : Profile
         // Request DTO to Command
         CreateMap<CreateCategoryRequest, CreateCategoryCommand>();
         
-        // For UpdateCategoryCommand, we need to handle the Id parameter
+        // For UpdateCourseCommand, we need to handle the Id parameter
         CreateMap<(UpdateCategoryRequest Request, int Id), UpdateCategoryCommand>()
             .ConstructUsing(src => new UpdateCategoryCommand(src.Id, src.Request.Name, src.Request.Slug));
     }

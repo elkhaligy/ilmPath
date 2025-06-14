@@ -58,7 +58,7 @@ public class UserBookmarkRepository : IUserBookmarkRepository
 
     public async Task UpdateUserBookmarkAsync(UserBookmark userBookmark)
     {
-        var existingUserBookmark = await _context.InvoiceItems.FindAsync(userBookmark.Id);
+        var existingUserBookmark = await _context.UserBookmarks.FindAsync(userBookmark.Id);
         if (existingUserBookmark == null)
             throw new NotFoundException(nameof(UserBookmark), userBookmark.Id);
 
