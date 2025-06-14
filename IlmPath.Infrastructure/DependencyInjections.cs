@@ -7,6 +7,7 @@ using IlmPath.Infrastructure.Enrollments.Persistence;
 using IlmPath.Infrastructure.InvoiceItems.Persistence;
 using IlmPath.Infrastructure.Invoices.Persistence;
 using IlmPath.Infrastructure.Seed;
+using IlmPath.Infrastructure.UserBookmarks.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -55,8 +56,7 @@ public static class DependencyInjection
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
         services.AddScoped<IInvoiceRepository, InvoiceRepository>();
         services.AddScoped<IInvoiceItemRepository, InvoiceItemRepository>();
-
-
+        services.AddScoped<IUserBookmarkRepository, UserBookmarkRepository>();
 
         return services;
     }
