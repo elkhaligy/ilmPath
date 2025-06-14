@@ -63,7 +63,7 @@ namespace IlmPath.Infrastructure.Courses.Presistance
 
         public async Task UpdateAsync(Course course)
         {
-                
+ 
             _context.Entry(course).State = EntityState.Modified;
             await _context.SaveChangesAsync();
 
