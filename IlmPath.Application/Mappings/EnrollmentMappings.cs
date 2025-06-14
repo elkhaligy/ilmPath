@@ -14,19 +14,33 @@ namespace IlmPath.Application.Mappings
 {
     class EnrollmentMappings : Profile
     {
+<<<<<<< Updated upstream
         public EnrollmentMappings()
         {
             // Domain to Response DTO
             CreateMap<Enrollment, EnrollmentResponse>();
             CreateMap<CreateEnrollmentCommand, Enrollment>();
+=======
+        // Domain to Response DTO
+        CreateMap<Enrollment, EnrollmentResponse>();
+        CreateMap<CreateEnrollmentCommand, Enrollment>();
+        CreateMap<UpdateEnrollmentCommand, Enrollment>();
+
+>>>>>>> Stashed changes
 
 
             // Request DTO to Command
             CreateMap<CreateEnrollmentRequest, CreateEnrollmentCommand>();
 
+<<<<<<< Updated upstream
             // For UpdateCategoryCommand, we need to handle the Id parameter
             CreateMap<(UpdateEnrollmentRequest Request, int Id), UpdateEnrollmentCommand>()
                 .ConstructUsing(src => new UpdateEnrollmentCommand(src.Id, src.Request.EnrollmentDate, src.Request.PricePaid));
         }
+=======
+        // For UpdateCategoryCommand, we need to handle the Id parameter
+        CreateMap<(UpdateEnrollmentRequest Request, int Id), UpdateEnrollmentCommand>()
+            .ConstructUsing(src => new UpdateEnrollmentCommand(src.Id,src.Request.UserId, src.Request.CourseId, src.Request.EnrollmentDate, src.Request.PricePaid));
+>>>>>>> Stashed changes
     }
 }
