@@ -44,7 +44,8 @@ namespace IlmPath.Infrastructure.Invoices.Persistence
             var totalCount = await _context.Invoices.CountAsync();
 
             var invoices = await _context.Invoices
-            .Include(i => i.Items)
+            .Include(i => i.Payment)
+            .Include(i => i.User)
             .OrderByDescending(i => i.IssueDate)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
@@ -56,8 +57,9 @@ namespace IlmPath.Infrastructure.Invoices.Persistence
         public async Task<Invoice?> GetInvoiceByIdAsync(int id)
         {
             return await _context.Invoices
-           .Include(i => i.Items)
-           .FirstOrDefaultAsync(i => i.Id ==id);
+                    .Include(i => i.Payment)
+                    .Include(i => i.User).
+                    FirstOrDefaultAsync(i => i.Id ==id);
         }
 
         public async Task UpdateInvoiceAsync(Invoice invoice)

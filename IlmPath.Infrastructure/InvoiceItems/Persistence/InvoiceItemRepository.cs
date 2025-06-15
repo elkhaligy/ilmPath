@@ -44,6 +44,8 @@ public class InvoiceItemRepository : IInvoiceItemRepository
         var totalCount = await _context.InvoiceItems.CountAsync();
 
         var invoiceItems = await _context.InvoiceItems
+        .Include(i => i.Invoice)
+        .Include(i => i.Course)
         .Skip((pageNumber - 1) * pageSize)
         .Take(pageSize)
         .ToListAsync();
@@ -53,7 +55,10 @@ public class InvoiceItemRepository : IInvoiceItemRepository
 
     public async Task<InvoiceItem?> GetInvoiceItemByIdAsync(int id)
     {
-        return await _context.InvoiceItems.FindAsync(id);
+        return await _context.InvoiceItems
+        .Include(i => i.Invoice)
+        .Include(i => i.Course)
+        .FirstOrDefaultAsync(i=>i.Id==id);
     }
 
     public async Task UpdateInvoiceItemAsync(InvoiceItem invoiceItem)

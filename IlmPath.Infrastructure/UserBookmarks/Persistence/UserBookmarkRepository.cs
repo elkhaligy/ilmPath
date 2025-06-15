@@ -44,6 +44,8 @@ public class UserBookmarkRepository : IUserBookmarkRepository
         var totalCount = await _context.UserBookmarks.CountAsync();
 
         var userBookmarks = await _context.UserBookmarks
+        .Include(u=> u.User)
+        .Include(u => u.Course)
         .Skip((pageNumber - 1) * pageSize)
         .Take(pageSize)
         .ToListAsync();
@@ -53,7 +55,10 @@ public class UserBookmarkRepository : IUserBookmarkRepository
 
     public async Task<UserBookmark?> GetUserBookmarkByIdAsync(int id)
     {
-        return await _context.UserBookmarks.FindAsync(id);
+        return await _context.UserBookmarks
+        .Include(u=> u.Course)
+        .Include(u=> u.User)
+        .FirstOrDefaultAsync(u=> u.Id == id);
     }
 
     public async Task UpdateUserBookmarkAsync(UserBookmark userBookmark)

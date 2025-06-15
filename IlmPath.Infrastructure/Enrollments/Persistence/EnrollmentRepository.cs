@@ -44,7 +44,7 @@ namespace IlmPath.Infrastructure.Enrollments.Persistence
 
             var enrollments = await _context.Enrollments
             .Include(e => e.User)
-            .Include(e => e.OrderDetails)
+            .Include(e => e.Course)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
@@ -55,7 +55,8 @@ namespace IlmPath.Infrastructure.Enrollments.Persistence
         public async Task<Enrollment?> GetEnrollmentByIdAsync(int id)
         {
             return await _context.Enrollments
-            .Include(e => e.OrderDetails)
+            .Include(e => e.User)
+            .Include(e => e.Course)
             .FirstOrDefaultAsync(i => i.Id == id);
         }
 
