@@ -6,7 +6,7 @@ using IlmPath.Infrastructure.UpdateDatabaseIntializerEx;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using Microsoft.OpenApi.Models;
 using System.Threading.Tasks;
 
 namespace IlmPath.Api;
@@ -28,6 +28,33 @@ public class Program
                 Title = "iLmPath API",
                 Version = "v1"
             });
+
+
+            // ba3ml authorization 3lshan ba test el redisCart 
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Please enter a valid JWT",
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                BearerFormat = "JWT",
+                Scheme = "bearer"
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
         });
 
         builder.Services.AddInfrastructure(builder.Configuration);

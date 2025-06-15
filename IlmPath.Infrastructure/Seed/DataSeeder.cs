@@ -1,4 +1,5 @@
-﻿using IlmPath.Domain.Entities;
+﻿using IlmPath.Application.Common.Interfaces;
+using IlmPath.Domain.Entities;
 using IlmPath.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,10 +12,12 @@ namespace IlmPath.Infrastructure.Seed;
 public class DataSeeder
 {
     private readonly ApplicationDbContext _context;
+    private readonly ICartRepository _cartRepository; 
 
-    public DataSeeder(ApplicationDbContext context)
+    public DataSeeder(ApplicationDbContext context,ICartRepository cartRepository)
     {
         _context = context;
+        _cartRepository = cartRepository;
     }
 
     public async Task SeedAsync()
@@ -45,11 +48,8 @@ public class DataSeeder
             await _context.SaveChangesAsync();
 
             // A user can only have one cart.
-            await SeedCartsAsync(user.Id);
-            await _context.SaveChangesAsync();
 
-            await SeedCartItemsAsync();
-            await _context.SaveChangesAsync();
+            await SeedCartWithItemsAsync(user.Id);
 
             await SeedEnrollmentsAsync(user.Id);
             await _context.SaveChangesAsync();
@@ -157,25 +157,39 @@ public class DataSeeder
         await _context.Coupons.AddRangeAsync(coupons);
     }
 
-    private async Task SeedCartsAsync(string userId)
+    private async Task SeedCartWithItemsAsync(string userId)
     {
-        if (await _context.Carts.AnyAsync(c => c.UserId == userId)) return;
-        // A user can only have one cart, so we only create one.
-        var cart = new Cart { UserId = userId };
-        await _context.Carts.AddAsync(cart);
+        var existingCart = await _cartRepository.GetCartAsync(userId);
+        if (existingCart != null && existingCart.Items.Any())
+        {
+            return;
+        }
+
+        var cart = new Cart(userId);
+
+        var coursesToAdd = await _context.Courses
+            .AsNoTracking()
+            .Take(2) 
+            .ToListAsync();
+
+        if (coursesToAdd.Any())
+        {
+            foreach (var course in coursesToAdd)
+            {
+                cart.Items.Add(new CartItem
+                {
+                    CourseId = course.Id,
+                    Title = course.Title,
+                    Price = course.Price,
+                    ThumbnailImageUrl = course.ThumbnailImageUrl
+                });
+            }
+        }
+
+        await _cartRepository.UpdateCartAsync(cart);
     }
 
-    private async Task SeedCartItemsAsync()
-    {
-        if (await _context.CartItems.AnyAsync()) return;
-        var cart = await _context.Carts.FirstOrDefaultAsync();
-        var courses = await _context.Courses.Where(c => c.IsPublished).ToListAsync();
-        if (cart == null || !courses.Any()) return;
 
-        var cartItems = courses.Take(3).Select(course => new CartItem { CartId = cart.Id, CourseId = course.Id }).ToList();
-
-        await _context.CartItems.AddRangeAsync(cartItems);
-    }
 
     private async Task SeedEnrollmentsAsync(string userId)
     {
