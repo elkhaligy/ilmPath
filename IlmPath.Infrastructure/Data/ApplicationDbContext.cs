@@ -25,8 +25,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<UserBookmark> UserBookmarks { get; set; }
 
     // Shopping & Payments
-    public DbSet<Cart> Carts { get; set; }
-    public DbSet<CartItem> CartItems { get; set; }
+    //public DbSet<Cart> Carts { get; set; }
+    //public DbSet<CartItem> CartItems { get; set; }
     public DbSet<Enrollment> Enrollments { get; set; }
     public DbSet<Payment> Payments { get; set; }
     public DbSet<OrderDetail> OrderDetails { get; set; }
@@ -77,29 +77,29 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                   .OnDelete(DeleteBehavior.NoAction);
         });
 
-        // Cart
-        builder.Entity<Cart>(entity =>
-        {
-            entity.HasIndex(c => c.UserId)
-                  .IsUnique();
+        //// Cart
+        //builder.Entity<Cart>(entity =>
+        //{
+        //    entity.HasIndex(c => c.UserId)
+        //          .IsUnique();
 
-            entity.HasOne(c => c.User)
-                  .WithOne(u => u.Cart)
-                  .HasForeignKey<Cart>(c => c.UserId)
-                  .OnDelete(DeleteBehavior.NoAction);
-        });
+        //    entity.HasOne(c => c.User)
+        //          .WithOne(u => u.Cart)
+        //          .HasForeignKey<Cart>(c => c.UserId)
+        //          .OnDelete(DeleteBehavior.NoAction);
+        //});
 
-        // CartItem
-        builder.Entity<CartItem>(entity =>
-        {
-            entity.HasIndex(ci => new { ci.CartId, ci.CourseId })
-                  .IsUnique();
+        //// CartItem
+        //builder.Entity<CartItem>(entity =>
+        //{
+        //    entity.HasIndex(ci => new { ci.CartId, ci.CourseId })
+        //          .IsUnique();
 
-            entity.HasOne(ci => ci.Cart)
-                  .WithMany(c => c.Items)
-                  .HasForeignKey(ci => ci.CartId)
-                  .OnDelete(DeleteBehavior.Cascade);
-        });
+        //    entity.HasOne(ci => ci.Cart)
+        //          .WithMany(c => c.Items)
+        //          .HasForeignKey(ci => ci.CartId)
+        //          .OnDelete(DeleteBehavior.Cascade);
+        //});
 
         // Enrollment
         builder.Entity<Enrollment>(entity =>
