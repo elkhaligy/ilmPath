@@ -1,5 +1,6 @@
 using IlmPath.Application.Common.Interfaces;
 using IlmPath.Domain.Entities;
+using IlmPath.Infrastructure.Carts;
 using IlmPath.Infrastructure.Categories.Persistence;
 using IlmPath.Infrastructure.Courses.Persistence;
 using IlmPath.Infrastructure.Data;
@@ -16,6 +17,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 using System.Text;
 namespace IlmPath.Infrastructure;
 
@@ -50,7 +52,16 @@ public static class DependencyInjection
                 IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:Secret"]))
             };
         });
-        
+
+
+        // For Redis
+        services.AddSingleton<IConnectionMultiplexer>(sp =>
+        {
+            var redisConfiguration = ConfigurationOptions.Parse(configuration.GetConnectionString("Redis"), true);
+            return ConnectionMultiplexer.Connect(redisConfiguration);
+        });
+
+
         services.AddScoped<ICategoriesRepository, CategoriesRepository>();
         services.AddScoped<DataSeeder>();
         services.AddScoped<IdentitySeeder>();
@@ -63,6 +74,7 @@ public static class DependencyInjection
         services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
 
 
+        services.AddScoped<ICartRepository, RedisCartRepository>();
         return services;
     }
 }

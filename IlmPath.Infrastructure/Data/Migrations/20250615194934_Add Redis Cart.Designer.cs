@@ -4,6 +4,7 @@ using IlmPath.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IlmPath.Infrastructure.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250615194934_Add Redis Cart")]
+    partial class AddRedisCart
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -474,6 +477,9 @@ namespace IlmPath.Infrastructure.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ApplicationUserId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
@@ -488,10 +494,11 @@ namespace IlmPath.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ApplicationUserId");
+
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("EnrollmentId")
-                        .IsUnique();
+                    b.HasIndex("EnrollmentId");
 
                     b.HasIndex("PaymentId");
 
@@ -874,15 +881,19 @@ namespace IlmPath.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("IlmPath.Domain.Entities.OrderDetail", b =>
                 {
+                    b.HasOne("IlmPath.Domain.Entities.ApplicationUser", null)
+                        .WithMany("Orders")
+                        .HasForeignKey("ApplicationUserId");
+
                     b.HasOne("IlmPath.Domain.Entities.Course", "Course")
-                        .WithMany("OrderDetails")
+                        .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("IlmPath.Domain.Entities.Enrollment", "Enrollment")
-                        .WithOne("OrderDetail")
-                        .HasForeignKey("IlmPath.Domain.Entities.OrderDetail", "EnrollmentId")
+                        .WithMany("OrderDetails")
+                        .HasForeignKey("EnrollmentId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -1003,6 +1014,8 @@ namespace IlmPath.Infrastructure.Data.Migrations
 
                     b.Navigation("Invoices");
 
+                    b.Navigation("Orders");
+
                     b.Navigation("Payments");
                 });
 
@@ -1026,8 +1039,6 @@ namespace IlmPath.Infrastructure.Data.Migrations
 
                     b.Navigation("InvoiceItems");
 
-                    b.Navigation("OrderDetails");
-
                     b.Navigation("Ratings");
 
                     b.Navigation("Sections");
@@ -1035,7 +1046,7 @@ namespace IlmPath.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("IlmPath.Domain.Entities.Enrollment", b =>
                 {
-                    b.Navigation("OrderDetail");
+                    b.Navigation("OrderDetails");
                 });
 
             modelBuilder.Entity("IlmPath.Domain.Entities.Invoice", b =>

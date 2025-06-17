@@ -13,7 +13,6 @@ public class ApplicationUser : IdentityUser
     public string? ProfileImageUrl { get; set; } 
 
     // Navigation properties
-    public virtual Cart? Cart { get; set; }
     public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
     public virtual ICollection<CourseRating> CourseRatings { get; set; } = new List<CourseRating>();
     public virtual ICollection<UserBookmark> Bookmarks { get; set; } = new List<UserBookmark>();
