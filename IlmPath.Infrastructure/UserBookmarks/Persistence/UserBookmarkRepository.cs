@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using IlmPath.Application.Common.Exceptions;
+﻿using IlmPath.Application.Common.Exceptions;
 using IlmPath.Application.Common.Interfaces;
 using IlmPath.Domain.Entities;
 using IlmPath.Infrastructure.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,12 +15,10 @@ namespace IlmPath.Infrastructure.UserBookmarks.Persistence;
 public class UserBookmarkRepository : IUserBookmarkRepository
 {
     private readonly ApplicationDbContext _context;
-    private readonly IMapper _mapper;
 
-    public UserBookmarkRepository(ApplicationDbContext context, IMapper mapper)
+    public UserBookmarkRepository(ApplicationDbContext context)
     {
         _context = context;
-        _mapper = mapper;
     }
 
     public async Task AddUserBookmarkAsync(UserBookmark userBookmark)
@@ -44,6 +42,8 @@ public class UserBookmarkRepository : IUserBookmarkRepository
         var totalCount = await _context.UserBookmarks.CountAsync();
 
         var userBookmarks = await _context.UserBookmarks
+        .Include(u=> u.User)
+        .Include(u => u.Course)
         .Skip((pageNumber - 1) * pageSize)
         .Take(pageSize)
         .ToListAsync();
@@ -53,7 +53,10 @@ public class UserBookmarkRepository : IUserBookmarkRepository
 
     public async Task<UserBookmark?> GetUserBookmarkByIdAsync(int id)
     {
-        return await _context.UserBookmarks.FindAsync(id);
+        return await _context.UserBookmarks
+        .Include(u=> u.Course)
+        .Include(u=> u.User)
+        .FirstOrDefaultAsync(u=> u.Id == id);
     }
 
     public async Task UpdateUserBookmarkAsync(UserBookmark userBookmark)
@@ -62,8 +65,10 @@ public class UserBookmarkRepository : IUserBookmarkRepository
         if (existingUserBookmark == null)
             throw new NotFoundException(nameof(UserBookmark), userBookmark.Id);
 
-        _mapper.Map(userBookmark, existingUserBookmark);
+        existingUserBookmark.UserId = userBookmark.UserId;
+        existingUserBookmark.CourseId = userBookmark.CourseId;
+        existingUserBookmark.CreatedAt = userBookmark.CreatedAt;
 
-        await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
     }
 }

@@ -40,4 +40,7 @@ public class Course
     public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
     public virtual ICollection<InvoiceItem> InvoiceItems { get; set; } = new List<InvoiceItem>();
     public virtual ICollection<Coupon> ApplicableCoupons { get; set; } = new List<Coupon>(); // Course-specific coupons
+    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+
+
 }

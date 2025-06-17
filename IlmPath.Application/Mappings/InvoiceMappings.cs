@@ -24,10 +24,6 @@ class InvoiceMappings : Profile
         CreateMap<UpdateInvoiceCommand, Invoice>();
 
 
-        // Domain to Domain for Update
-        CreateMap<Invoice, Invoice>();
-
-
         // Request DTO to Command
         CreateMap<CreateInvoiceRequest, CreateInvoiceCommand>();
 

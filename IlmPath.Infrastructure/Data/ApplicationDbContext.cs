@@ -2,6 +2,7 @@ using IlmPath.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace IlmPath.Infrastructure.Data;
 
@@ -131,12 +132,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                   .OnDelete(DeleteBehavior.NoAction);
 
             entity.HasOne(od => od.Enrollment)
-                  .WithMany(e => e.OrderDetails)
-                  .HasForeignKey(od => od.EnrollmentId)
+                  .WithOne(e => e.OrderDetail)
                   .OnDelete(DeleteBehavior.NoAction);
 
             entity.HasOne(od => od.Course)
-                  .WithMany()
+                  .WithMany(c=>c.OrderDetails)
                   .HasForeignKey(od => od.CourseId)
                   .OnDelete(DeleteBehavior.NoAction);
         });

@@ -11,6 +11,7 @@ namespace IlmPath.Application.Enrollments.DTOs.Requests;
 
 public class CreateEnrollmentRequest
 {
+    [Required]
     public string UserId { get; set; } = string.Empty; // FK to ApplicationUser
 
     [Required]

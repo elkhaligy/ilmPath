@@ -15,7 +15,6 @@ public class ApplicationUser : IdentityUser
     // Navigation properties
     public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
     public virtual ICollection<CourseRating> CourseRatings { get; set; } = new List<CourseRating>();
-    public virtual ICollection<OrderDetail> Orders { get; set; } = new List<OrderDetail>();
     public virtual ICollection<UserBookmark> Bookmarks { get; set; } = new List<UserBookmark>();
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
     public virtual ICollection<Invoice> Invoices { get; set; } = new List<Invoice>();
