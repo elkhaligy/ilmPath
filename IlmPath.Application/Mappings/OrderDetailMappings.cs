@@ -27,8 +27,6 @@ class OrderDetailMappings : Profile
         CreateMap<UpdateOrderDetailCommand, OrderDetail>();
 
 
-        // Domain to Domain for Update
-        CreateMap<OrderDetail, OrderDetail>();
 
 
         // Request DTO to Command

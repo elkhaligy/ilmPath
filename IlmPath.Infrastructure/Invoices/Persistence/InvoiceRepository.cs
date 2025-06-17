@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using IlmPath.Application.Common.Exceptions;
+﻿using IlmPath.Application.Common.Exceptions;
 using IlmPath.Application.Common.Interfaces;
 using IlmPath.Domain.Entities;
 using IlmPath.Infrastructure.Data;
@@ -15,13 +14,10 @@ namespace IlmPath.Infrastructure.Invoices.Persistence
     class InvoiceRepository : IInvoiceRepository
     {
         private readonly ApplicationDbContext _context;
-        private readonly IMapper _mapper;
 
-
-        public InvoiceRepository(ApplicationDbContext context, IMapper mapper)
+        public InvoiceRepository(ApplicationDbContext context)
         {
             _context = context;
-            _mapper = mapper;
         }
         public async Task AddInvoiceAsync(Invoice invoice)
         {
@@ -67,8 +63,15 @@ namespace IlmPath.Infrastructure.Invoices.Persistence
             var existingInvoice = await _context.Invoices.FindAsync(invoice.Id);
             if (existingInvoice == null)
                 throw new NotFoundException(nameof(Invoice), invoice.Id);
+            existingInvoice.InvoiceNumber = invoice.InvoiceNumber;
+            existingInvoice.UserId = invoice.UserId;
+            existingInvoice.PaymentId = invoice.PaymentId;
+            existingInvoice.IssueDate = invoice.IssueDate;
+            existingInvoice.DueDate = invoice.DueDate;
+            existingInvoice.BillingAddress = invoice.BillingAddress;
+            existingInvoice.Status = invoice.Status;
+            existingInvoice.Notes = invoice.Notes;
 
-             _mapper.Map(invoice,existingInvoice);
 
             await _context.SaveChangesAsync();
         }

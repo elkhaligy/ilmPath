@@ -24,9 +24,6 @@ class UserBookmarkMappings : Profile
         CreateMap<UpdateUserBookmarkCommand, UserBookmark>();
 
 
-        // Domain to Domain for Update
-        CreateMap<UserBookmark, UserBookmark>();
-
 
         // Request DTO to Command
         CreateMap<CreateUserBookmarkRequest, CreateUserBookmarkCommand>();

@@ -23,11 +23,6 @@ class InvoiceItemMappings : Profile
         CreateMap<CreateInvoiceItemCommand, InvoiceItem>();
         CreateMap<UpdateInvoiceItemCommand, InvoiceItem>();
 
-
-        // Domain to Domain for Update
-        CreateMap<InvoiceItem, InvoiceItem>();
-
-
         // Request DTO to Command
         CreateMap<CreateInvoiceItemRequest, CreateInvoiceItemCommand>();
 

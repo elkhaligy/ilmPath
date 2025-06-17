@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using IlmPath.Application.Common.Exceptions;
+﻿using IlmPath.Application.Common.Exceptions;
 using IlmPath.Application.Common.Interfaces;
 using IlmPath.Domain.Entities;
 using IlmPath.Infrastructure.Data;
@@ -15,12 +14,10 @@ namespace IlmPath.Infrastructure.OrderDetails.Persistence;
 class OrderDetailRepository : IOrderDetailRepository
 {
     private readonly ApplicationDbContext _context;
-    private readonly IMapper _mapper;
 
-    public OrderDetailRepository(ApplicationDbContext context, IMapper mapper)
+    public OrderDetailRepository(ApplicationDbContext context)
     {
         _context = context;
-        _mapper = mapper;
     }
     public async Task AddOrderDetailAsync(OrderDetail orderDetail)
     {
@@ -68,7 +65,11 @@ class OrderDetailRepository : IOrderDetailRepository
         if (existingOrderDetail == null)
             throw new NotFoundException(nameof(OrderDetail), orderDetail.Id);
 
-        _mapper.Map(orderDetail, existingOrderDetail);
+        existingOrderDetail.PaymentId = orderDetail.PaymentId;
+        existingOrderDetail.EnrollmentId = orderDetail.EnrollmentId;
+        existingOrderDetail.CourseId = orderDetail.CourseId;
+        existingOrderDetail.PriceAtPurchase = orderDetail.PriceAtPurchase;
+
 
         await _context.SaveChangesAsync();
     }

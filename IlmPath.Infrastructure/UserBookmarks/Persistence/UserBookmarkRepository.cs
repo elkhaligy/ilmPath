@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using IlmPath.Application.Common.Exceptions;
+﻿using IlmPath.Application.Common.Exceptions;
 using IlmPath.Application.Common.Interfaces;
 using IlmPath.Domain.Entities;
 using IlmPath.Infrastructure.Data;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,12 +15,10 @@ namespace IlmPath.Infrastructure.UserBookmarks.Persistence;
 public class UserBookmarkRepository : IUserBookmarkRepository
 {
     private readonly ApplicationDbContext _context;
-    private readonly IMapper _mapper;
 
-    public UserBookmarkRepository(ApplicationDbContext context, IMapper mapper)
+    public UserBookmarkRepository(ApplicationDbContext context)
     {
         _context = context;
-        _mapper = mapper;
     }
 
     public async Task AddUserBookmarkAsync(UserBookmark userBookmark)
@@ -67,8 +65,10 @@ public class UserBookmarkRepository : IUserBookmarkRepository
         if (existingUserBookmark == null)
             throw new NotFoundException(nameof(UserBookmark), userBookmark.Id);
 
-        _mapper.Map(userBookmark, existingUserBookmark);
+        existingUserBookmark.UserId = userBookmark.UserId;
+        existingUserBookmark.CourseId = userBookmark.CourseId;
+        existingUserBookmark.CreatedAt = userBookmark.CreatedAt;
 
-        await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();
     }
 }

@@ -1,8 +1,8 @@
-﻿using AutoMapper;
-using IlmPath.Application.Common.Exceptions;
+﻿using IlmPath.Application.Common.Exceptions;
 using IlmPath.Application.Common.Interfaces;
 using IlmPath.Domain.Entities;
 using IlmPath.Infrastructure.Data;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -15,13 +15,11 @@ namespace IlmPath.Infrastructure.InvoiceItems.Persistence;
 public class InvoiceItemRepository : IInvoiceItemRepository
 {
     private readonly ApplicationDbContext _context;
-    private readonly IMapper _mapper;
 
 
-    public InvoiceItemRepository(ApplicationDbContext context, IMapper mapper)
+    public InvoiceItemRepository(ApplicationDbContext context)
     {
         _context = context;
-        _mapper = mapper;
     }
     public async Task AddInvoiceItemAsync(InvoiceItem invoiceItem)
     {
@@ -67,7 +65,12 @@ public class InvoiceItemRepository : IInvoiceItemRepository
         if (existingInvoiceItem == null)
             throw new NotFoundException(nameof(InvoiceItem), invoiceItem.Id);
 
-        _mapper.Map(invoiceItem, existingInvoiceItem);
+        existingInvoiceItem.InvoiceId = invoiceItem.InvoiceId;
+        existingInvoiceItem.CourseId = invoiceItem.CourseId;
+        existingInvoiceItem.Description = invoiceItem.Description;
+        existingInvoiceItem.OriginalUnitPrice = invoiceItem.UnitPrice;
+        existingInvoiceItem.DiscountAppliedOnItem = invoiceItem.DiscountAppliedOnItem;
+        existingInvoiceItem.UnitPrice = invoiceItem.UnitPrice;
 
         await _context.SaveChangesAsync();
     }
