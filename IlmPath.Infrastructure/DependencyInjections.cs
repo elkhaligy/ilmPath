@@ -10,6 +10,7 @@ using IlmPath.Infrastructure.Invoices.Persistence;
 using IlmPath.Infrastructure.Lectures.Persistence;
 using IlmPath.Infrastructure.OrderDetails.Persistence;
 using IlmPath.Infrastructure.Payments.Persistence;
+using IlmPath.Infrastructure.Sections.Persistence;
 using IlmPath.Infrastructure.Seed;
 using IlmPath.Infrastructure.Services;
 using IlmPath.Infrastructure.UserBookmarks.Persistence;
@@ -75,6 +76,7 @@ public static class DependencyInjection
         services.AddScoped<ILectureRepository, LectureRepository>();
         services.AddScoped<IOrderDetailRepository, OrderDetailRepository>();
         services.AddScoped<IPaymentRepository, PaymentRepository>();
+        services.AddScoped<ISectionRepository, SectionRepository>();
 
 
         services.AddScoped<ICartRepository, RedisCartRepository>();
