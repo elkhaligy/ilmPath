@@ -11,6 +11,7 @@ using IlmPath.Infrastructure.Lectures.Persistence;
 using IlmPath.Infrastructure.OrderDetails.Persistence;
 using IlmPath.Infrastructure.Payments.Persistence;
 using IlmPath.Infrastructure.Seed;
+using IlmPath.Infrastructure.Services;
 using IlmPath.Infrastructure.UserBookmarks.Persistence;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
@@ -77,6 +78,9 @@ public static class DependencyInjection
 
 
         services.AddScoped<ICartRepository, RedisCartRepository>();
+        
+        // Services
+        services.AddScoped<IStripeService, StripeService>();
         return services;
     }
 }
