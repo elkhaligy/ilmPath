@@ -1,0 +1,23 @@
+﻿using IlmPath.Domain.Entities;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace IlmPath.Application.AppliedCoupons.DTOs.Responses;
+
+public class AppliedCouponResponse
+{
+    public int Id { get; set; } 
+    public int CouponId { get; set; } // FK to Coupon
+
+    public string UserId { get; set; } = string.Empty; // FK to ApplicationUser
+
+    public int PaymentId { get; set; } // FK to Payment
+
+    public decimal DiscountAmountApplied { get; set; }
+    public DateTime AppliedAt { get; set; } = DateTime.UtcNow;
+}
