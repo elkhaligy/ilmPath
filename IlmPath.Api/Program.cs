@@ -19,7 +19,18 @@ public class Program
         // --- Service Configuration ---
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
+        // Add cors
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAllOrigins", builder =>
+            {
+                builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+        });
         
+
         // AddSwaggerGen registers the Swagger generator, defining one or more Swagger documents.
         builder.Services.AddSwaggerGen(options =>
         {
@@ -89,6 +100,7 @@ public class Program
 
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseCors("AllowAllOrigins");
         app.MapControllers();
 
         app.Run();

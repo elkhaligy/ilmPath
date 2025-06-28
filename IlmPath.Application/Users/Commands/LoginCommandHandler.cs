@@ -37,14 +37,27 @@ public class LoginCommandHandler : IRequestHandler<LoginCommand, TokenResponse>
         // 2. Build the claims
         var authClaims = new List<Claim>
         {
-            new Claim(ClaimTypes.Email,user.Email),
-            new Claim(ClaimTypes.NameIdentifier,user.Id),
+        // Standard claims
+        new Claim(JwtRegisteredClaimNames.Sub, user.Id),
+        new Claim(JwtRegisteredClaimNames.Email, user.Email ?? ""),
+        new Claim(JwtRegisteredClaimNames.Name, user.UserName ?? ""),
+        new Claim(JwtRegisteredClaimNames.GivenName, user.FirstName ?? ""),
+        new Claim(JwtRegisteredClaimNames.FamilyName, user.LastName ?? ""),
+        new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+        new Claim(JwtRegisteredClaimNames.Iat, 
+            new DateTimeOffset(DateTime.UtcNow).ToUnixTimeSeconds().ToString(), 
+            ClaimValueTypes.Integer64),
+
+        // Custom claims
+        new Claim("profile_image", user.ProfileImageUrl ?? ""),
+        new Claim("is_active", user.IsActive.ToString().ToLower()),
+        new Claim("created_at", user.CreatedAt.ToString("O")), // ISO 8601 format
         };
 
         var userRoles = await _userManager.GetRolesAsync(user);
         foreach (var userRole in userRoles)
         {
-            authClaims.Add(new Claim(ClaimTypes.Role, userRole));
+            authClaims.Add(new Claim("role", userRole));
         }
 
         // 3. Generate the token

@@ -31,7 +31,19 @@ public static class DependencyInjection
     {
         services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(configuration.GetConnectionString("DefaultConnection")));
-        services.AddIdentity<ApplicationUser, IdentityRole>() 
+        services.AddIdentity<ApplicationUser, IdentityRole>(options => 
+        {
+            // Disable ALL password requirements
+            options.Password.RequireDigit = false;
+            options.Password.RequireLowercase = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequiredLength = 1;                 // Minimum possible
+            options.Password.RequiredUniqueChars = 1;            // Minimum possible
+            
+            // Optional: Keep email unique
+            options.User.RequireUniqueEmail = true;
+        })
                 .AddEntityFrameworkStores<ApplicationDbContext>()
                 .AddDefaultTokenProviders();
 
