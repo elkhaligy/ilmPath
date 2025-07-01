@@ -6,7 +6,7 @@ using IlmPath.Infrastructure.UpdateDatabaseIntializerEx;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using Microsoft.OpenApi.Models;
 using System.Threading.Tasks;
 
 namespace IlmPath.Api;
@@ -19,7 +19,18 @@ public class Program
         // --- Service Configuration ---
         builder.Services.AddControllers();
         builder.Services.AddEndpointsApiExplorer();
+        // Add cors
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAllOrigins", builder =>
+            {
+                builder.AllowAnyOrigin()
+                    .AllowAnyMethod()
+                    .AllowAnyHeader();
+            });
+        });
         
+
         // AddSwaggerGen registers the Swagger generator, defining one or more Swagger documents.
         builder.Services.AddSwaggerGen(options =>
         {
@@ -28,6 +39,33 @@ public class Program
                 Title = "iLmPath API",
                 Version = "v1"
             });
+
+
+            // ba3ml authorization 3lshan ba test el redisCart 
+            options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                In = ParameterLocation.Header,
+                Description = "Please enter a valid JWT",
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                BearerFormat = "JWT",
+                Scheme = "bearer"
+            });
+
+            options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
         });
 
         builder.Services.AddInfrastructure(builder.Configuration);
@@ -62,6 +100,7 @@ public class Program
 
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseCors("AllowAllOrigins");
         app.MapControllers();
 
         app.Run();

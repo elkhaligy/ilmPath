@@ -37,8 +37,10 @@ public class Course
     public virtual ICollection<Section> Sections { get; set; } = new List<Section>();
     public virtual ICollection<CourseRating> Ratings { get; set; } = new List<CourseRating>();
     public virtual ICollection<UserBookmark> BookmarkedByUsers { get; set; } = new List<UserBookmark>();
-    public virtual ICollection<CartItem> CartItems { get; set; } = new List<CartItem>();
     public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();
     public virtual ICollection<InvoiceItem> InvoiceItems { get; set; } = new List<InvoiceItem>();
     public virtual ICollection<Coupon> ApplicableCoupons { get; set; } = new List<Coupon>(); // Course-specific coupons
+    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+
+
 }

@@ -140,59 +140,6 @@ namespace IlmPath.Infrastructure.Data.Migrations
                     b.ToTable("AppliedCoupons");
                 });
 
-            modelBuilder.Entity("IlmPath.Domain.Entities.Cart", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId")
-                        .IsUnique();
-
-                    b.ToTable("Carts");
-                });
-
-            modelBuilder.Entity("IlmPath.Domain.Entities.CartItem", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("AddedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("CartId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CourseId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CourseId");
-
-                    b.HasIndex("CartId", "CourseId")
-                        .IsUnique();
-
-                    b.ToTable("CartItems");
-                });
-
             modelBuilder.Entity("IlmPath.Domain.Entities.Category", b =>
                 {
                     b.Property<int>("Id")
@@ -468,14 +415,8 @@ namespace IlmPath.Infrastructure.Data.Migrations
                     b.Property<int>("InvoiceId")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("LineTotal")
-                        .HasColumnType("decimal(18,2)");
-
                     b.Property<decimal>("OriginalUnitPrice")
                         .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("Quantity")
-                        .HasColumnType("int");
 
                     b.Property<decimal>("UnitPrice")
                         .HasColumnType("decimal(18,2)");
@@ -533,9 +474,6 @@ namespace IlmPath.Infrastructure.Data.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("CourseId")
                         .HasColumnType("int");
 
@@ -550,11 +488,10 @@ namespace IlmPath.Infrastructure.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
-
                     b.HasIndex("CourseId");
 
-                    b.HasIndex("EnrollmentId");
+                    b.HasIndex("EnrollmentId")
+                        .IsUnique();
 
                     b.HasIndex("PaymentId");
 
@@ -814,36 +751,6 @@ namespace IlmPath.Infrastructure.Data.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("IlmPath.Domain.Entities.Cart", b =>
-                {
-                    b.HasOne("IlmPath.Domain.Entities.ApplicationUser", "User")
-                        .WithOne("Cart")
-                        .HasForeignKey("IlmPath.Domain.Entities.Cart", "UserId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("IlmPath.Domain.Entities.CartItem", b =>
-                {
-                    b.HasOne("IlmPath.Domain.Entities.Cart", "Cart")
-                        .WithMany("Items")
-                        .HasForeignKey("CartId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("IlmPath.Domain.Entities.Course", "Course")
-                        .WithMany("CartItems")
-                        .HasForeignKey("CourseId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Cart");
-
-                    b.Navigation("Course");
-                });
-
             modelBuilder.Entity("IlmPath.Domain.Entities.Coupon", b =>
                 {
                     b.HasOne("IlmPath.Domain.Entities.Course", "Course")
@@ -967,19 +874,15 @@ namespace IlmPath.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("IlmPath.Domain.Entities.OrderDetail", b =>
                 {
-                    b.HasOne("IlmPath.Domain.Entities.ApplicationUser", null)
-                        .WithMany("Orders")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("IlmPath.Domain.Entities.Course", "Course")
-                        .WithMany()
+                        .WithMany("OrderDetails")
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("IlmPath.Domain.Entities.Enrollment", "Enrollment")
-                        .WithMany("OrderDetails")
-                        .HasForeignKey("EnrollmentId")
+                        .WithOne("OrderDetail")
+                        .HasForeignKey("IlmPath.Domain.Entities.OrderDetail", "EnrollmentId")
                         .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
@@ -1094,22 +997,13 @@ namespace IlmPath.Infrastructure.Data.Migrations
 
                     b.Navigation("Bookmarks");
 
-                    b.Navigation("Cart");
-
                     b.Navigation("CourseRatings");
 
                     b.Navigation("Enrollments");
 
                     b.Navigation("Invoices");
 
-                    b.Navigation("Orders");
-
                     b.Navigation("Payments");
-                });
-
-            modelBuilder.Entity("IlmPath.Domain.Entities.Cart", b =>
-                {
-                    b.Navigation("Items");
                 });
 
             modelBuilder.Entity("IlmPath.Domain.Entities.Category", b =>
@@ -1128,11 +1022,11 @@ namespace IlmPath.Infrastructure.Data.Migrations
 
                     b.Navigation("BookmarkedByUsers");
 
-                    b.Navigation("CartItems");
-
                     b.Navigation("Enrollments");
 
                     b.Navigation("InvoiceItems");
+
+                    b.Navigation("OrderDetails");
 
                     b.Navigation("Ratings");
 
@@ -1141,7 +1035,7 @@ namespace IlmPath.Infrastructure.Data.Migrations
 
             modelBuilder.Entity("IlmPath.Domain.Entities.Enrollment", b =>
                 {
-                    b.Navigation("OrderDetails");
+                    b.Navigation("OrderDetail");
                 });
 
             modelBuilder.Entity("IlmPath.Domain.Entities.Invoice", b =>

@@ -24,5 +24,5 @@ public class Enrollment
     public decimal PricePaid { get; set; }
 
     // Navigation property (if linking to OrderDetail directly from here)
-    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
+    public virtual OrderDetail? OrderDetail { get; set; }
 }

@@ -11,6 +11,12 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
+    <PackageReference Include="StackExchange.Redis" Version="2.8.41" />
+    <PackageReference Include="Stripe.net" Version="48.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Invoices\Persistence\" />
   </ItemGroup>
 
   <PropertyGroup>
