@@ -70,6 +70,7 @@ public class Program
 
         builder.Services.AddInfrastructure(builder.Configuration);
         builder.Services.AddApplication();
+        builder.Services.AddHttpClient();
 
         var app = builder.Build();
 

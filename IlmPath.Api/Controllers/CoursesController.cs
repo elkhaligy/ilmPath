@@ -68,6 +68,17 @@ namespace IlmPath.Api.Controllers
         }
 
 
+        [HttpGet("category")]
+        [ProducesResponseType(typeof(PagedResult<CourseResponse>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PagedResult<CourseResponse>>> GetCoursesByCategory([FromQuery]GetCoursesByCategoryIdQuery query)
+        {
+            var mediatRQuery = new GetCoursesByCategoryIdQuery(query.CategoryId, query.PageNumber, query.PageSize);
+            var result = await _mediator.Send(mediatRQuery);
+            return Ok(result);
+        }
+
+
+
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
 
