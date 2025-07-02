@@ -11,6 +11,8 @@ namespace IlmPath.Application.Common.Interfaces
     {
         Task<Course?> GetByIdAsync(int id);
         Task<(IEnumerable<Course> Courses, int TotalCount)> GetAllAsync(int pageNumber, int pageSize);
+        Task<(IEnumerable<Course> Courses, int TotalCount)> GetByCategoryIdAsync(int categoryId, int pageNumber, int pageSize);
+
         Task<Course> AddAsync(Course course);
         Task UpdateAsync(Course course);
         Task DeleteAsync(int id);

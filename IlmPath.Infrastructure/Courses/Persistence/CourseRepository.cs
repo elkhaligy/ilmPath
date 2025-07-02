@@ -53,6 +53,24 @@ namespace IlmPath.Infrastructure.Courses.Persistence
 
         }
 
+        public async Task<(IEnumerable<Course> Courses, int TotalCount)> GetByCategoryIdAsync(int categoryId, int pageNumber, int pageSize)
+        {
+            var query = _context.Courses
+                .Where(c => c.CategoryId == categoryId);
+
+            var totalCount = await query.CountAsync();
+
+            var courses = await query
+                .Include(c => c.Category)
+                .Include(c => c.Instructor)
+                .OrderByDescending(c => c.CreatedAt) 
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (courses, totalCount);
+        }
+
         public async Task<Course?> GetByIdAsync(int id)
         {
             return await _context.Courses
