@@ -98,6 +98,8 @@ public static class DependencyInjection
         
         // Services
         services.AddScoped<IStripeService, StripeService>();
+        services.AddScoped<IVideoUploadService, GoogleCloudStorageService>();
+        
         return services;
     }
 }

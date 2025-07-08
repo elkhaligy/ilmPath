@@ -13,6 +13,7 @@ using IlmPath.Application.Lectures.Commands.UpdateLecture;
 using IlmPath.Application.Lectures.Commands.DeleteLecture;
 using IlmPath.Application.Lectures.Commands.UpdateLectureOrder;
 using IlmPath.Application.Lectures.Commands.ToggleLecturePreview;
+using IlmPath.Application.Lectures.Commands.UploadVideo;
 
 namespace IlmPath.Api.Controllers;
 
@@ -22,6 +23,7 @@ namespace IlmPath.Api.Controllers;
 // PUT /api/lectures/{id}
 // DELETE /api/lectures/{id}
 // GET /api/sections/{sectionId}/lectures
+// POST /api/lectures/{id}/video
 
 [Route("api/")]
 [ApiController]
@@ -47,6 +49,28 @@ public class LecturesController : ControllerBase
         var lectureResponse = await _mediator.Send(command);
 
         return CreatedAtAction(nameof(GetById), new { id = lectureResponse.Id }, lectureResponse);
+    }
+
+    [HttpPost("lectures/{id}/video")]
+    [ProducesResponseType(typeof(UploadVideoResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> UploadVideo(int id, IFormFile videoFile)
+    {
+        if (videoFile == null || videoFile.Length == 0)
+        {
+            return BadRequest("No video file provided");
+        }
+
+        var command = new UploadVideoCommand
+        {
+            LectureId = id,
+            VideoFile = videoFile
+        };
+
+        var response = await _mediator.Send(command);
+
+        return Ok(response);
     }
 
     [HttpPut("lectures/{id}")]
