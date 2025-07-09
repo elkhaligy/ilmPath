@@ -74,5 +74,19 @@ namespace IlmPath.Infrastructure.Enrollments.Persistence
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task<bool> IsUserEnrolledInCourseAsync(string userId, int courseId)
+        {
+            return await _context.Enrollments
+                .AnyAsync(e => e.UserId == userId && e.CourseId == courseId);
+        }
+
+        public async Task<Enrollment?> GetEnrollmentByUserAndCourseAsync(string userId, int courseId)
+        {
+            return await _context.Enrollments
+                .Include(e => e.User)
+                .Include(e => e.Course)
+                .FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == courseId);
+        }
     }
 }
