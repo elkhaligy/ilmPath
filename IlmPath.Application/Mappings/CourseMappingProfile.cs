@@ -16,7 +16,8 @@ namespace IlmPath.Application.Mappings
 
         public CourseMappingProfile()
         {
-            CreateMap<CreateCourseCommand, Course>();
+            CreateMap<CreateCourseCommand, Course>()
+                .ForMember(dest => dest.ThumbnailImageUrl, opt => opt.Ignore()); // Handled in command handler
             CreateMap<UpdateCourseCommand, Course>();
 
             CreateMap<Course, CourseResponse>()

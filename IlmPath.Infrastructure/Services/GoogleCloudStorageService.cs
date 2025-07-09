@@ -91,6 +91,45 @@ namespace IlmPath.Infrastructure.Services
             }
         }
 
+        public async Task<string> UploadFileAsync(Stream fileStream, string fileName, string contentType)
+        {
+            try
+            {
+                // Validate parameters
+                if (fileStream == null || fileStream.Length == 0)
+                {
+                    throw new ArgumentException("File stream is null or empty");
+                }
+
+                if (string.IsNullOrEmpty(fileName))
+                {
+                    throw new ArgumentException("File name cannot be null or empty");
+                }
+
+                _logger.LogInformation($"Uploading file to GCS: {fileName}");
+
+                // Upload to Google Cloud Storage
+                var storageObject = await _storageClient.UploadObjectAsync(
+                    bucket: _bucketName,
+                    objectName: fileName,
+                    contentType: contentType,
+                    source: fileStream
+                );
+
+                // Generate public URL
+                var publicUrl = $"https://storage.googleapis.com/{_bucketName}/{fileName}";
+                
+                _logger.LogInformation($"File uploaded successfully: {publicUrl}");
+                
+                return publicUrl;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error uploading file to Google Cloud Storage");
+                throw;
+            }
+        }
+
         public async Task<bool> DeleteVideoAsync(string videoUrl)
         {
             try
