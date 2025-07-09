@@ -14,5 +14,7 @@ namespace IlmPath.Application.Common.Interfaces
         Task AddEnrollmentAsync(Enrollment enrollment);
         Task UpdateEnrollmentAsync(Enrollment enrollment);
         Task DeleteEnrollmentAsync(int id);
+        Task<bool> IsUserEnrolledInCourseAsync(string userId, int courseId);
+        Task<Enrollment?> GetEnrollmentByUserAndCourseAsync(string userId, int courseId);
     }
 }
