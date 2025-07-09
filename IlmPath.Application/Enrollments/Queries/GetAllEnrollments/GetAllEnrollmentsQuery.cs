@@ -8,4 +8,4 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace IlmPath.Application.Enrollments.Queries.GetAllEnrollments;
-public record GetAllEnrollmentsQuery(int PageNumber = 1, int PageSize = 10) : IRequest<(IEnumerable<Enrollment>, int count)>;
+public record GetAllEnrollmentsQuery(int PageNumber = 1, int PageSize = 10, string? UserId = null) : IRequest<(IEnumerable<Enrollment>, int count)>;

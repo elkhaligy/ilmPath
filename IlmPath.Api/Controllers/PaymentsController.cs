@@ -38,7 +38,7 @@ public class PaymentsController(IMediator _mediator, IStripeService _stripeServi
     // This endpoint is used to verify if the payment was successful and process the payment
     // So the command will be called ProcessPaymentSuccessCommand
     [HttpPost("verify-payment/{sessionId}")]
-    public async Task<ActionResult<object>> VerifyAndProcessPayment(string sessionId)
+    public async Task<ActionResult<VerifyPaymentResponse>> VerifyAndProcessPayment(string sessionId)
     {
         var userId = GetCurrentUserId();
         
@@ -47,26 +47,46 @@ public class PaymentsController(IMediator _mediator, IStripeService _stripeServi
         
         if (!isSuccessful)
         {
-            return Ok(new { Success = false, Message = "Payment not completed yet" });
+            return Ok(new VerifyPaymentResponse 
+            { 
+                Success = false, 
+                Message = "Payment not completed yet" 
+            });
         }
 
         // Check if already processed (prevent duplicate processing)
         var existingPayment = await _paymentRepository.GetPaymentByTransactionIdAsync(sessionId);
         if (existingPayment != null)
         {
-            return Ok(new { Success = true, Message = "Payment already processed", AlreadyProcessed = true });
+            return Ok(new VerifyPaymentResponse 
+            { 
+                Success = true, 
+                Message = "Payment already processed", 
+                AlreadyProcessed = true,
+                SessionId = sessionId
+            });
         }
 
         // Process the payment
         var command = new ProcessPaymentSuccessCommand(sessionId, userId);
-        var success = await _mediator.Send(command);
+        var (success, successUrl) = await _mediator.Send(command);
         
         if (success)
         {
-            return Ok(new { Success = true, Message = "Payment processed successfully! You are now enrolled in your courses." });
+            return Ok(new VerifyPaymentResponse 
+            { 
+                Success = true, 
+                Message = "Payment processed successfully! You are now enrolled in your courses.",
+                SuccessUrl = successUrl,
+                SessionId = sessionId
+            });
         }
         
-        return StatusCode(500, new { Success = false, Message = "Error processing payment" });
+        return StatusCode(500, new VerifyPaymentResponse 
+        { 
+            Success = false, 
+            Message = "Error processing payment" 
+        });
     }
 
     [HttpGet("my-payments")]

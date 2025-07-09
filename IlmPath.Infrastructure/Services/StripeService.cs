@@ -53,7 +53,7 @@ public class StripeService : IStripeService
             PaymentMethodTypes = new List<string> { "card" },
             LineItems = lineItems,
             Mode = "payment",
-            SuccessUrl = successUrl,
+            SuccessUrl = $"{successUrl}?session_id={{CHECKOUT_SESSION_ID}}",
             CancelUrl = cancelUrl,
             Metadata = new Dictionary<string, string>
             {
@@ -112,7 +112,8 @@ public class StripeService : IStripeService
                 PaymentStatus = session.PaymentStatus ?? "unknown",
                 TotalAmount = (decimal)(session.AmountTotal ?? 0) / 100, // Convert from cents
                 CourseIds = courseIds,
-                PaymentIntentId = session.PaymentIntentId ?? session.Id
+                PaymentIntentId = session.PaymentIntentId ?? session.Id,
+                SuccessUrl = session.SuccessUrl ?? string.Empty
             };
         }
         catch (Exception)
