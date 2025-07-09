@@ -42,15 +42,15 @@ namespace IlmPath.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(CourseResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create(
-            [FromForm] string title,
-            [FromForm] string description,
-            [FromForm] decimal price,
-            [FromForm] string instructorId,
-            [FromForm] int? categoryId,
-            [FromForm] IFormFile? thumbnailFile = null)
+        public async Task<IActionResult> Create([FromForm] CreateCourseRequest request)
         {
-            var command = new CreateCourseCommand(title, description, price, instructorId, categoryId, thumbnailFile);
+            var command = new CreateCourseCommand(
+                request.Title, 
+                request.Description, 
+                request.Price, 
+                request.InstructorId, 
+                request.CategoryId, 
+                request.ThumbnailFile);
             var courseResponse = await _mediator.Send(command);
 
             return CreatedAtAction(nameof(GetById), new { id = courseResponse.Id }, courseResponse);
@@ -62,17 +62,17 @@ namespace IlmPath.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(
-            int id,
-            [FromForm] string title,
-            [FromForm] string description,
-            [FromForm] decimal price,
-            [FromForm] bool isPublished,
-            [FromForm] string? thumbnailImageUrl = null,
-            [FromForm] int? categoryId = null,
-            [FromForm] IFormFile? thumbnailFile = null)
+        public async Task<IActionResult> Update(int id, [FromForm] UpdateCourseRequest request)
         {
-            var command = new UpdateCourseCommand(id, title, description, price, isPublished, thumbnailImageUrl, categoryId, thumbnailFile);
+            var command = new UpdateCourseCommand(
+                id, 
+                request.Title, 
+                request.Description, 
+                request.Price, 
+                request.IsPublished, 
+                request.ThumbnailImageUrl, 
+                request.CategoryId, 
+                request.ThumbnailFile);
             await _mediator.Send(command);
 
             return NoContent();
