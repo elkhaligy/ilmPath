@@ -50,5 +50,17 @@ namespace IlmPath.Api.Controllers
             return Ok(cart);
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> DeleteMyCart()
+        {
+            var userId = GetCurrentUserId();
+            var command = new DeleteCartCommand(userId);
+            var result = await _mediator.Send(command);
+            if (result)
+                return Ok();
+            else
+                return NotFound();
+        }
+
     }
 }
