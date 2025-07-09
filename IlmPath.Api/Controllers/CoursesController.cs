@@ -5,6 +5,7 @@ using IlmPath.Application.Courses.Commands.UpdateCourse;
 using IlmPath.Application.Courses.DTOs;
 using IlmPath.Application.Courses.Queries.GetAllCourses;
 using IlmPath.Application.Courses.Queries.GetCourseById;
+using IlmPath.Application.Courses.Queries.GetCourseWithContent;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -37,6 +38,16 @@ namespace IlmPath.Api.Controllers
 
           
             return course != null ? Ok(course) : NotFound();
+        }
+
+        [HttpGet("{id:int}/learn")]
+        [ProducesResponseType(typeof(CourseWithContentResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<CourseWithContentResponse>> GetCourseWithContent(int id)
+        {
+            var query = new GetCourseWithContentQuery(id);
+            var courseWithContent = await _mediator.Send(query);
+            return Ok(courseWithContent);
         }
 
         [HttpPost]

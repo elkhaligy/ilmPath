@@ -11,18 +11,25 @@ using System.Threading.Tasks;
 
 namespace IlmPath.Application.Mappings
 {
-    public class CourseMappingProfile:Profile
+    public class CourseMappingProfile : Profile
     {
-
         public CourseMappingProfile()
         {
-            CreateMap<CreateCourseCommand, Course>()
-                .ForMember(dest => dest.ThumbnailImageUrl, opt => opt.Ignore()); // Handled in command handler
-            CreateMap<UpdateCourseCommand, Course>();
-
             CreateMap<Course, CourseResponse>()
-                        .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null))
-                        .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Instructor != null ? $"{src.Instructor.FirstName} {src.Instructor.LastName}" : null));
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null))
+                .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Instructor != null ? src.Instructor.UserName : null));
+
+            CreateMap<CreateCourseCommand, Course>();
+            CreateMap<UpdateCourseCommand, Course>();
+            
+            // New mapping for course with content
+            CreateMap<Course, CourseWithContentResponse>()
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category != null ? src.Category.Name : null))
+                .ForMember(dest => dest.InstructorName, opt => opt.MapFrom(src => src.Instructor != null ? src.Instructor.UserName : null))
+                .ForMember(dest => dest.Sections, opt => opt.Ignore()) // Will be mapped manually in handler
+                .ForMember(dest => dest.TotalDurationMinutes, opt => opt.Ignore())
+                .ForMember(dest => dest.TotalLecturesCount, opt => opt.Ignore())
+                .ForMember(dest => dest.SectionsCount, opt => opt.Ignore());
         }
     }
 }
