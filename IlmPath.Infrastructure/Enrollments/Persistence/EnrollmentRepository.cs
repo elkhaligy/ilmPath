@@ -88,5 +88,21 @@ namespace IlmPath.Infrastructure.Enrollments.Persistence
                 .Include(e => e.Course)
                 .FirstOrDefaultAsync(e => e.UserId == userId && e.CourseId == courseId);
         }
+
+        public async Task<(IEnumerable<Enrollment> enrollments, int TotalCount)> GetEnrollmentsByUserIdAsync(string userId, int pageNumber, int pageSize)
+        {
+            var query = _context.Enrollments
+                .Include(e => e.User)
+                .Include(e => e.Course)
+                .Where(e => e.UserId == userId);
+
+            var totalCount = await query.CountAsync();
+            var enrollments = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return (enrollments, totalCount);
+        }
     }
 }

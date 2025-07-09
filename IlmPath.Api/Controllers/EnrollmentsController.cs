@@ -57,6 +57,17 @@ public class EnrollmentsController : ControllerBase
         return Ok(new PagedResult<EnrollmentResponse>(enrollmentResponses, totalCount, query.PageNumber, query.PageSize));
     }
 
+    // GET: api/enrollments/user
+    [HttpGet("user")]
+    public async Task<ActionResult<PagedResult<EnrollmentResponse>>> GetUserEnrollments([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    {
+        var userId = GetCurrentUserId();
+        var query = new GetAllEnrollmentsQuery(pageNumber, pageSize, userId);
+        var (enrollments, totalCount) = await _mediator.Send(query);
+        var enrollmentResponses = _mapper.Map<List<EnrollmentResponse>>(enrollments);
+        return Ok(new PagedResult<EnrollmentResponse>(enrollmentResponses, totalCount, pageNumber, pageSize));
+    }
+
     // GET: api/enrollments/{id}
     [HttpGet("{id}")]
     public async Task<ActionResult<EnrollmentResponse>> GetById(int id)
