@@ -42,8 +42,15 @@ namespace IlmPath.Api.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(CourseResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create(CreateCourseCommand command)
+        public async Task<IActionResult> Create(
+            [FromForm] string title,
+            [FromForm] string description,
+            [FromForm] decimal price,
+            [FromForm] string instructorId,
+            [FromForm] int? categoryId,
+            [FromForm] IFormFile? thumbnailFile = null)
         {
+            var command = new CreateCourseCommand(title, description, price, instructorId, categoryId, thumbnailFile);
             var courseResponse = await _mediator.Send(command);
 
             return CreatedAtAction(nameof(GetById), new { id = courseResponse.Id }, courseResponse);
@@ -55,13 +62,17 @@ namespace IlmPath.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, UpdateCourseCommand command)
+        public async Task<IActionResult> Update(
+            int id,
+            [FromForm] string title,
+            [FromForm] string description,
+            [FromForm] decimal price,
+            [FromForm] bool isPublished,
+            [FromForm] string? thumbnailImageUrl = null,
+            [FromForm] int? categoryId = null,
+            [FromForm] IFormFile? thumbnailFile = null)
         {
-            if (id != command.Id)
-            {
-                return BadRequest("ID mismatch between route and body.");
-            }
-
+            var command = new UpdateCourseCommand(id, title, description, price, isPublished, thumbnailImageUrl, categoryId, thumbnailFile);
             await _mediator.Send(command);
 
             return NoContent();
