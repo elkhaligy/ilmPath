@@ -36,21 +36,27 @@ namespace IlmPath.Infrastructure.Courses.Persistence
 
         }
 
-        public async Task<(IEnumerable<Course> Courses, int TotalCount)> GetAllAsync(int pageNumber, int pageSize)
+        public async Task<(IEnumerable<Course> Courses, int TotalCount)> GetAllAsync(int pageNumber, int pageSize, string? searchQuery = null)
         {
+            var query = _context.Courses.AsQueryable();
 
-            var totalCount = await _context.Courses.CountAsync();
+            // Apply search filter if search query is provided
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                query = query.Where(c => c.Title.Contains(searchQuery) || c.Description.Contains(searchQuery));
+            }
 
-            var courses = await _context.Courses
-            .Include(c => c.Category)
-            .Include(c => c.Instructor)
-            .OrderByDescending(c => c.CreatedAt) 
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .ToListAsync();
+            var totalCount = await query.CountAsync();
+
+            var courses = await query
+                .Include(c => c.Category)
+                .Include(c => c.Instructor)
+                .OrderByDescending(c => c.CreatedAt) 
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
            
             return (courses, totalCount);
-
         }
 
         public async Task<(IEnumerable<Course> Courses, int TotalCount)> GetByCategoryIdAsync(int categoryId, int pageNumber, int pageSize)

@@ -10,7 +10,7 @@ namespace IlmPath.Application.Common.Interfaces
     public interface ICourseRepository
     {
         Task<Course?> GetByIdAsync(int id);
-        Task<(IEnumerable<Course> Courses, int TotalCount)> GetAllAsync(int pageNumber, int pageSize);
+        Task<(IEnumerable<Course> Courses, int TotalCount)> GetAllAsync(int pageNumber, int pageSize, string? searchQuery = null);
         Task<(IEnumerable<Course> Courses, int TotalCount)> GetByCategoryIdAsync(int categoryId, int pageNumber, int pageSize);
         Task<(IEnumerable<Course> Courses, int TotalCount)> GetByInstructorIdAsync(string instructorId, int pageNumber, int pageSize);
 
