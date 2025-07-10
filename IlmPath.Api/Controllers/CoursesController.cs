@@ -9,8 +9,10 @@ using IlmPath.Application.Courses.Queries.GetCourseWithContent;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using System;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace IlmPath.Api.Controllers
 {
@@ -18,6 +20,7 @@ namespace IlmPath.Api.Controllers
     [ApiController]
     public class CoursesController(IMediator _mediator) : ControllerBase
     {
+        private string GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
         [HttpGet]
         [ProducesResponseType(typeof(PagedResult<CourseResponse>), StatusCodes.Status200OK)]
@@ -51,17 +54,26 @@ namespace IlmPath.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize] // ✅ Require authentication
         [ProducesResponseType(typeof(CourseResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> Create([FromForm] CreateCourseRequest request)
         {
+            var instructorId = GetCurrentUserId(); // ✅ Extract from auth token
+            if (string.IsNullOrEmpty(instructorId))
+            {
+                return Unauthorized("User not authenticated");
+            }
+
             var command = new CreateCourseCommand(
                 request.Title, 
                 request.Description, 
                 request.Price, 
-                request.InstructorId, 
+                instructorId, // ✅ Use authenticated user's ID
                 request.CategoryId, 
-                request.ThumbnailFile);
+                request.ThumbnailFile,
+                request.IsPublished);
             var courseResponse = await _mediator.Send(command);
 
             return CreatedAtAction(nameof(GetById), new { id = courseResponse.Id }, courseResponse);
@@ -70,11 +82,23 @@ namespace IlmPath.Api.Controllers
 
 
         [HttpPut("{id:int}")]
+        [Authorize] // ✅ Require authentication for updates
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Update(int id, [FromForm] UpdateCourseRequest request)
         {
+            var currentUserId = GetCurrentUserId();
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("User not authenticated");
+            }
+
+            // TODO: Add authorization check to ensure user owns this course
+            // For now, we'll let the command handler deal with authorization
+
             var command = new UpdateCourseCommand(
                 id, 
                 request.Title, 
@@ -100,26 +124,42 @@ namespace IlmPath.Api.Controllers
         }
 
         [HttpGet("instructor")]
+        [Authorize] // ✅ Also secure this endpoint
         [ProducesResponseType(typeof(PagedResult<CourseResponse>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<PagedResult<CourseResponse>>> GetCoursesByInstructor([FromQuery]GetCoursesByInstructorIdQuery query)
+        public async Task<ActionResult<PagedResult<CourseResponse>>> GetCoursesByInstructor([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var mediatRQuery = new GetCoursesByInstructorIdQuery(query.InstructorId, query.PageNumber, query.PageSize);
+            var instructorId = GetCurrentUserId(); // ✅ Extract from auth token
+            if (string.IsNullOrEmpty(instructorId))
+            {
+                return Unauthorized("User not authenticated");
+            }
+
+            var mediatRQuery = new GetCoursesByInstructorIdQuery(instructorId, pageNumber, pageSize);
             var result = await _mediator.Send(mediatRQuery);
             return Ok(result);
         }
 
 
 
-        [HttpDelete]
+        [HttpDelete("{id:int}")]
+        [Authorize] // ✅ Require authentication for deletes
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> Delete(int id)
         {
-            var query = new DeleteCourseCommand(id);
+            var currentUserId = GetCurrentUserId();
+            if (string.IsNullOrEmpty(currentUserId))
+            {
+                return Unauthorized("User not authenticated");
+            }
 
-            await _mediator.Send(query);
+            // TODO: Add authorization check to ensure user owns this course
+            // For now, we'll let the command handler deal with authorization
+
+            var command = new DeleteCourseCommand(id);
+            await _mediator.Send(command);
             return NoContent();
         }
 
