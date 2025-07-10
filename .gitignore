@@ -5,7 +5,7 @@
 
 # dotenv files
 .env
-
+ffprobe.exe
 # User-specific files
 *.rsuser
 *.suo

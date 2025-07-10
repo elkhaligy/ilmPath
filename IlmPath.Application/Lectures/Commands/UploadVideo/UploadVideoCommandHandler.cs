@@ -36,24 +36,27 @@ namespace IlmPath.Application.Lectures.Commands.UploadVideo
                     throw new NotFoundException(nameof(lecture), request.LectureId);
                 }
 
-                _logger.LogInformation($"Uploading video for lecture {request.LectureId}");
+                _logger.LogInformation($"Uploading video with duration extraction for lecture {request.LectureId}");
 
-                // Upload video to Google Cloud Storage
-                var videoUrl = await _videoUploadService.UploadVideoAsync(
+                // Upload video to Google Cloud Storage with duration extraction
+                var uploadResult = await _videoUploadService.UploadVideoWithDurationAsync(
                     request.VideoFile, 
                     request.LectureId.ToString());
 
-                // Update lecture with new video URL
-                lecture.VideoUrl = videoUrl;
+                // Update lecture with new video URL and duration
+                lecture.VideoUrl = uploadResult.VideoUrl;
+                lecture.DurationInMinutes = uploadResult.DurationInMinutes;
 
                 await _lectureRepository.UpdateAsync(lecture);
 
-                _logger.LogInformation($"Video uploaded successfully for lecture {request.LectureId}: {videoUrl}");
+                _logger.LogInformation($"Video uploaded successfully for lecture {request.LectureId}: {uploadResult.VideoUrl}, Duration: {uploadResult.DurationInMinutes} minutes");
 
                 return new UploadVideoResponse
                 {
-                    VideoUrl = videoUrl,
-                    Message = "Video uploaded successfully"
+                    VideoUrl = uploadResult.VideoUrl,
+                    Message = "Video uploaded successfully",
+                    DurationInMinutes = uploadResult.DurationInMinutes,
+                    DurationInSeconds = uploadResult.DurationInSeconds
                 };
             }
             catch (Exception ex)
