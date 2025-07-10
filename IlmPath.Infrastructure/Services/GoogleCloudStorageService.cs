@@ -1,11 +1,13 @@
 using Google.Cloud.Storage.V1;
 using IlmPath.Application.Common.Interfaces;
+using IlmPath.Application.Common.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 using System.IO;
 using System.Threading.Tasks;
+using FFMpegCore;
 
 namespace IlmPath.Infrastructure.Services
 {
@@ -88,6 +90,110 @@ namespace IlmPath.Infrastructure.Services
             {
                 _logger.LogError(ex, "Error uploading video to Google Cloud Storage");
                 throw;
+            }
+        }
+
+        public async Task<VideoUploadResult> UploadVideoWithDurationAsync(IFormFile videoFile, string lectureId)
+        {
+            string tempFilePath = string.Empty;
+            
+            try
+            {
+                // Validate file
+                if (videoFile == null || videoFile.Length == 0)
+                {
+                    throw new ArgumentException("Video file is null or empty");
+                }
+
+                // Validate file type
+                var allowedTypes = new[] { "video/mp4", "video/avi", "video/mov", "video/wmv", "video/webm" };
+                if (!allowedTypes.Contains(videoFile.ContentType?.ToLower()))
+                {
+                    throw new ArgumentException($"Unsupported video format: {videoFile.ContentType}");
+                }
+
+                _logger.LogInformation($"Starting video upload with duration extraction for lecture {lectureId}");
+
+                // Create temporary file
+                var fileExtension = Path.GetExtension(videoFile.FileName);
+                tempFilePath = Path.Combine(Path.GetTempPath(), $"video_{Guid.NewGuid()}{fileExtension}");
+
+                _logger.LogInformation($"Saving video to temporary file: {tempFilePath}");
+
+                // Save video file temporarily
+                using (var fileStream = new FileStream(tempFilePath, FileMode.Create))
+                {
+                    await videoFile.CopyToAsync(fileStream);
+                }
+
+                _logger.LogInformation($"Video saved temporarily, extracting duration from: {tempFilePath}");
+
+                // Extract video duration using FFMpegCore
+                int durationInMinutes = 0;
+                double durationInSeconds = 0;
+
+                try
+                {
+                    var mediaInfo = await FFProbe.AnalyseAsync(tempFilePath);
+                    durationInSeconds = mediaInfo.Duration.TotalSeconds;
+                    durationInMinutes = (int)Math.Ceiling(mediaInfo.Duration.TotalMinutes);
+
+                    _logger.LogInformation($"Video duration extracted: {durationInSeconds:F2} seconds ({durationInMinutes} minutes)");
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning(ex, "Failed to extract video duration, defaulting to 0");
+                    // Continue with upload even if duration extraction fails
+                }
+
+                // Generate unique object name for GCS
+                var objectName = $"videos/lectures/{lectureId}/{Guid.NewGuid()}{fileExtension}";
+
+                _logger.LogInformation($"Uploading video to GCS: {objectName}");
+
+                // Upload to Google Cloud Storage from temporary file
+                using (var fileStream = new FileStream(tempFilePath, FileMode.Open, FileAccess.Read))
+                {
+                    var storageObject = await _storageClient.UploadObjectAsync(
+                        bucket: _bucketName,
+                        objectName: objectName,
+                        contentType: videoFile.ContentType,
+                        source: fileStream
+                    );
+                }
+
+                // Generate public URL
+                var publicUrl = $"https://storage.googleapis.com/{_bucketName}/{objectName}";
+                
+                _logger.LogInformation($"Video uploaded successfully with duration extraction: {publicUrl}");
+
+                return new VideoUploadResult
+                {
+                    VideoUrl = publicUrl,
+                    DurationInMinutes = durationInMinutes,
+                    DurationInSeconds = durationInSeconds
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error uploading video with duration extraction to Google Cloud Storage");
+                throw;
+            }
+            finally
+            {
+                // Clean up temporary file
+                if (!string.IsNullOrEmpty(tempFilePath) && File.Exists(tempFilePath))
+                {
+                    try
+                    {
+                        File.Delete(tempFilePath);
+                        _logger.LogInformation($"Temporary file deleted: {tempFilePath}");
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogWarning(ex, $"Failed to delete temporary file: {tempFilePath}");
+                    }
+                }
             }
         }
 
