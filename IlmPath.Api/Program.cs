@@ -7,7 +7,10 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
+using System.IO;
 using System.Threading.Tasks;
+using System;
 
 namespace IlmPath.Api;
 public class Program
@@ -40,6 +43,10 @@ public class Program
                 Version = "v1"
             });
 
+            // Set the comments path for the Swagger JSON and UI.
+            var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+            var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+            options.IncludeXmlComments(xmlPath);
 
             // ba3ml authorization 3lshan ba test el redisCart 
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

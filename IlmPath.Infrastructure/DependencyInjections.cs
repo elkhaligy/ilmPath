@@ -3,6 +3,7 @@ using IlmPath.Domain.Entities;
 using IlmPath.Infrastructure.AppliedCoupons.Persistence;
 using IlmPath.Infrastructure.Carts;
 using IlmPath.Infrastructure.Categories.Persistence;
+using IlmPath.Infrastructure.CourseRatings.Persistence;
 using IlmPath.Infrastructure.Courses.Persistence;
 using IlmPath.Infrastructure.Data;
 using IlmPath.Infrastructure.Enrollments.Persistence;
@@ -91,7 +92,7 @@ public static class DependencyInjection
         services.AddScoped<IPaymentRepository, PaymentRepository>();
         services.AddScoped<ISectionRepository, SectionRepository>();
         services.AddScoped<IAppliedCouponRepository, AppliedCouponRepository>();
-
+        services.AddScoped<ICourseRatingRepository, CourseRatingRepository>();
 
 
         services.AddScoped<ICartRepository, RedisCartRepository>();
