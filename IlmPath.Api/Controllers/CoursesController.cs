@@ -5,6 +5,7 @@ using IlmPath.Application.Courses.Commands.UpdateCourse;
 using IlmPath.Application.Courses.DTOs;
 using IlmPath.Application.Courses.Queries.GetAllCourses;
 using IlmPath.Application.Courses.Queries.GetCourseById;
+using IlmPath.Application.Courses.Queries.GetCourseWithContent;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -39,11 +40,28 @@ namespace IlmPath.Api.Controllers
             return course != null ? Ok(course) : NotFound();
         }
 
+        [HttpGet("{id:int}/learn")]
+        [ProducesResponseType(typeof(CourseWithContentResponse), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<CourseWithContentResponse>> GetCourseWithContent(int id)
+        {
+            var query = new GetCourseWithContentQuery(id);
+            var courseWithContent = await _mediator.Send(query);
+            return Ok(courseWithContent);
+        }
+
         [HttpPost]
         [ProducesResponseType(typeof(CourseResponse), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> Create(CreateCourseCommand command)
+        public async Task<IActionResult> Create([FromForm] CreateCourseRequest request)
         {
+            var command = new CreateCourseCommand(
+                request.Title, 
+                request.Description, 
+                request.Price, 
+                request.InstructorId, 
+                request.CategoryId, 
+                request.ThumbnailFile);
             var courseResponse = await _mediator.Send(command);
 
             return CreatedAtAction(nameof(GetById), new { id = courseResponse.Id }, courseResponse);
@@ -55,17 +73,32 @@ namespace IlmPath.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> Update(int id, UpdateCourseCommand command)
+        public async Task<IActionResult> Update(int id, [FromForm] UpdateCourseRequest request)
         {
-            if (id != command.Id)
-            {
-                return BadRequest("ID mismatch between route and body.");
-            }
-
+            var command = new UpdateCourseCommand(
+                id, 
+                request.Title, 
+                request.Description, 
+                request.Price, 
+                request.IsPublished, 
+                request.ThumbnailImageUrl, 
+                request.CategoryId, 
+                request.ThumbnailFile);
             await _mediator.Send(command);
 
             return NoContent();
         }
+
+
+        [HttpGet("category")]
+        [ProducesResponseType(typeof(PagedResult<CourseResponse>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PagedResult<CourseResponse>>> GetCoursesByCategory([FromQuery]GetCoursesByCategoryIdQuery query)
+        {
+            var mediatRQuery = new GetCoursesByCategoryIdQuery(query.CategoryId, query.PageNumber, query.PageSize);
+            var result = await _mediator.Send(mediatRQuery);
+            return Ok(result);
+        }
+
 
 
         [HttpDelete]

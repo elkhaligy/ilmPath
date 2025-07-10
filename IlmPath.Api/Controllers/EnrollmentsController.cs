@@ -9,25 +9,42 @@ using IlmPath.Application.Enrollments.DTOs.Requests;
 using IlmPath.Application.Enrollments.DTOs.Responses;
 using IlmPath.Application.Enrollments.Queries.GetAllEnrollments;
 using IlmPath.Application.Enrollments.Queries.GetEnrollmentById;
+using IlmPath.Application.Enrollments.Queries.CheckEnrollment;
 using IlmPath.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace IlmPath.Api.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class EnrollmentsController : ControllerBase
 {
     private readonly IMediator _mediator;
     private readonly IMapper _mapper;
+
+    private string GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
+
     public EnrollmentsController(IMediator mediator, IMapper mapper)
     {
         _mapper = mapper;
         _mediator = mediator;
+    }
+
+    // GET: api/enrollments/check/{courseId}
+    [HttpGet("check/{courseId}")]
+    public async Task<ActionResult<CheckEnrollmentResponse>> CheckEnrollment(int courseId)
+    {
+        var userId = GetCurrentUserId();
+        var query = new CheckEnrollmentQuery(userId, courseId);
+        var result = await _mediator.Send(query);
+        return Ok(result);
     }
 
     // GET: api/enrollments
@@ -38,6 +55,17 @@ public class EnrollmentsController : ControllerBase
         var enrollmentResponses = _mapper.Map<List<EnrollmentResponse>>(enrollments);
 
         return Ok(new PagedResult<EnrollmentResponse>(enrollmentResponses, totalCount, query.PageNumber, query.PageSize));
+    }
+
+    // GET: api/enrollments/user
+    [HttpGet("user")]
+    public async Task<ActionResult<PagedResult<EnrollmentResponse>>> GetUserEnrollments([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+    {
+        var userId = GetCurrentUserId();
+        var query = new GetAllEnrollmentsQuery(pageNumber, pageSize, userId);
+        var (enrollments, totalCount) = await _mediator.Send(query);
+        var enrollmentResponses = _mapper.Map<List<EnrollmentResponse>>(enrollments);
+        return Ok(new PagedResult<EnrollmentResponse>(enrollmentResponses, totalCount, pageNumber, pageSize));
     }
 
     // GET: api/enrollments/{id}

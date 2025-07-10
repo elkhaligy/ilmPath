@@ -11,8 +11,11 @@ namespace IlmPath.Application.Common.Interfaces
     {
         Task<Enrollment?> GetEnrollmentByIdAsync(int id);
         Task<(IEnumerable<Enrollment> enrollments, int TotalCount)> GetAllEnrollmentsAsync(int pageNumber, int pageSize);
+        Task<(IEnumerable<Enrollment> enrollments, int TotalCount)> GetEnrollmentsByUserIdAsync(string userId, int pageNumber, int pageSize);
         Task AddEnrollmentAsync(Enrollment enrollment);
         Task UpdateEnrollmentAsync(Enrollment enrollment);
         Task DeleteEnrollmentAsync(int id);
+        Task<bool> IsUserEnrolledInCourseAsync(string userId, int courseId);
+        Task<Enrollment?> GetEnrollmentByUserAndCourseAsync(string userId, int courseId);
     }
 }

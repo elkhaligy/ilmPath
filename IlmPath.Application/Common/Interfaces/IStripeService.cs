@@ -9,6 +9,7 @@ public class StripeSessionDetails
     public decimal TotalAmount { get; set; }
     public List<int> CourseIds { get; set; } = new();
     public string PaymentIntentId { get; set; }
+    public string SuccessUrl { get; set; } = string.Empty;
 }
 
 public interface IStripeService

@@ -70,6 +70,7 @@ public class Program
 
         builder.Services.AddInfrastructure(builder.Configuration);
         builder.Services.AddApplication();
+        builder.Services.AddHttpClient();
 
         var app = builder.Build();
 
@@ -95,7 +96,7 @@ public class Program
         }
 
         app.UseStaticFiles();
-        app.UseHttpsRedirection();
+        // app.UseHttpsRedirection();
         app.UseMiddleware<ExceptionHandlerMiddleware>();
 
         app.UseAuthentication();
