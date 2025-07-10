@@ -1,9 +1,11 @@
 
 using IlmPath.Application.Users.Commands;
+using IlmPath.Application.Users.Queries.GetUserProfile;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using YourApp.Application.Features.Authentication.Commands;
 
@@ -18,6 +20,22 @@ public class UsersController : ControllerBase
     public UsersController(IMediator mediator)
     {
         _mediator = mediator;
+    }
+
+    [Authorize]
+    [HttpGet("profile")]
+    public async Task<IActionResult> GetUserProfile()
+    {
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        var query = new GetUserProfileQuery { UserId = userId };
+        var result = await _mediator.Send(query);
+
+        return Ok(result);
     }
 
     [HttpPost("login")]

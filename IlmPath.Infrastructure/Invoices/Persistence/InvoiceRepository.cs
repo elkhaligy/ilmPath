@@ -53,9 +53,11 @@ namespace IlmPath.Infrastructure.Invoices.Persistence
         public async Task<Invoice?> GetInvoiceByIdAsync(int id)
         {
             return await _context.Invoices
+                    .Include(i => i.User)
                     .Include(i => i.Payment)
-                    .Include(i => i.User).
-                    FirstOrDefaultAsync(i => i.Id ==id);
+                    .Include(i => i.Items)
+                    .ThenInclude(item => item.Course)
+                    .FirstOrDefaultAsync(i => i.Id == id);
         }
 
         public async Task UpdateInvoiceAsync(Invoice invoice)

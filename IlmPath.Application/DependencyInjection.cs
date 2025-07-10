@@ -1,4 +1,5 @@
 using IlmPath.Api.Mappings;
+using IlmPath.Application.Email;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace IlmPath.Application;
@@ -12,6 +13,7 @@ public static class DependencyInjection
             options.RegisterServicesFromAssemblyContaining(typeof(DependencyInjection));
         });
         services.AddAutoMapper(typeof(DependencyInjection).Assembly);
+        services.AddTransient<IEmailService, EmailService>();
         return services;
     }
 }
