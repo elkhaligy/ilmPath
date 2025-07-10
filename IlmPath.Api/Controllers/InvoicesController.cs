@@ -2,6 +2,7 @@
 using IlmPath.Application.Common.Pagination;
 using IlmPath.Application.Invoices.Commands.CreateInvoice;
 using IlmPath.Application.Invoices.Commands.Delete_Invoice;
+using IlmPath.Application.Invoices.Commands.SendInvoiceEmail;
 using IlmPath.Application.Invoices.Commands.UpdateInvoice;
 using IlmPath.Application.Invoices.DTOs.Requests;
 using IlmPath.Application.Invoices.DTOs.Responses;
@@ -61,6 +62,15 @@ public class InvoicesController : ControllerBase
         var invoiceResponse = _mapper.Map<InvoiceResponse>(invoice);
 
         return CreatedAtAction(nameof(GetById), new { id = invoiceResponse.Id }, invoiceResponse);
+    }
+
+    // POST: api/invoices/{id}/send-test-email
+    [HttpPost("{id}/send-test-email")]
+    public async Task<IActionResult> SendTestEmail(int id)
+    {
+        var command = new SendInvoiceEmailCommand { InvoiceId = id };
+        await _mediator.Send(command);
+        return Ok(new { message = "Test email sent successfully." });
     }
 
 

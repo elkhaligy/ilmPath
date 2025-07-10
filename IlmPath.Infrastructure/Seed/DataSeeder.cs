@@ -14,7 +14,9 @@ public class DataSeeder
     private readonly ApplicationDbContext _context;
     private readonly ICartRepository _cartRepository; 
 
-    public DataSeeder(ApplicationDbContext context,ICartRepository cartRepository)
+    public DataSeeder(ApplicationDbContext context
+        ,ICartRepository cartRepository
+        )
     {
         _context = context;
         _cartRepository = cartRepository;
@@ -169,7 +171,7 @@ public class DataSeeder
 
         var coursesToAdd = await _context.Courses
             .AsNoTracking()
-            .Take(2) 
+            .Take(2)
             .ToListAsync();
 
         if (coursesToAdd.Any())
