@@ -99,6 +99,15 @@ namespace IlmPath.Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("instructor")]
+        [ProducesResponseType(typeof(PagedResult<CourseResponse>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PagedResult<CourseResponse>>> GetCoursesByInstructor([FromQuery]GetCoursesByInstructorIdQuery query)
+        {
+            var mediatRQuery = new GetCoursesByInstructorIdQuery(query.InstructorId, query.PageNumber, query.PageSize);
+            var result = await _mediator.Send(mediatRQuery);
+            return Ok(result);
+        }
+
 
 
         [HttpDelete]
