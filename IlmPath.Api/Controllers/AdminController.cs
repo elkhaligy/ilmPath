@@ -12,6 +12,8 @@ using IlmPath.Application.Common.Interfaces;
 using IlmPath.Application.Payouts.Commands.GenerateInstructorPayout;
 using IlmPath.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
+using IlmPath.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace IlmPath.Api.Controllers
 {
@@ -24,15 +26,17 @@ namespace IlmPath.Api.Controllers
         private readonly IInstructorPayoutRepository _payoutRepository;
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly IStripeConnectService _stripeConnectService;
+        private readonly ApplicationDbContext _dbContext;
 
         private string GetCurrentUserId() => User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-        public AdminController(IMediator mediator, IInstructorPayoutRepository payoutRepository, UserManager<ApplicationUser> userManager, IStripeConnectService stripeConnectService)
+        public AdminController(IMediator mediator, IInstructorPayoutRepository payoutRepository, UserManager<ApplicationUser> userManager, IStripeConnectService stripeConnectService, ApplicationDbContext dbContext)
         {
             _mediator = mediator;
             _payoutRepository = payoutRepository;
             _userManager = userManager;
             _stripeConnectService = stripeConnectService;
+            _dbContext = dbContext;
         }
 
         // GET: api/admin/withdrawal-requests
@@ -292,10 +296,320 @@ namespace IlmPath.Api.Controllers
                 TotalPendingAmount = allPayouts.Where(p => p.Status == "Pending").Sum(p => p.NetAmount),
                 TotalApprovedAmount = allPayouts.Where(p => p.Status == "Approved").Sum(p => p.NetAmount),
                 TotalCompletedAmount = allPayouts.Where(p => p.Status == "Completed").Sum(p => p.NetAmount),
-                LastUpdated = DateTime.UtcNow
+                LastUpdated = DateTime.UtcNow,
+                TotalUsers = _dbContext.Users.Count(),
+                TotalCourses = _dbContext.Courses.Count(),
+                TotalRevenue = _dbContext.Payments.Where(p => p.Status == "Completed").Sum(p => (decimal?)p.Amount) ?? 0
             };
 
             return Ok(stats);
+        }
+
+        // GET: api/admin/user-roles-distribution
+        [HttpGet("user-roles-distribution")]
+        [ProducesResponseType(typeof(Dictionary<string, int>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<Dictionary<string, int>>> GetUserRolesDistribution()
+        {
+            var result = new Dictionary<string, int>();
+            // Count Admins
+            var admins = await _userManager.GetUsersInRoleAsync("Admin");
+            result["Admin"] = admins.Count;
+
+            // Get all users except Admins
+            var allUsers = _dbContext.Users.ToList();
+            var adminIds = admins.Select(a => a.Id).ToHashSet();
+            var nonAdminUsers = allUsers.Where(u => !adminIds.Contains(u.Id)).ToList();
+
+            // Get user IDs who have at least one course (Instructors)
+            var instructorIds = _dbContext.Courses.Select(c => c.InstructorId).Distinct().ToHashSet();
+            var instructors = nonAdminUsers.Where(u => instructorIds.Contains(u.Id)).ToList();
+            var students = nonAdminUsers.Where(u => !instructorIds.Contains(u.Id)).ToList();
+
+            result["Instructor"] = instructors.Count;
+            result["Student"] = students.Count;
+
+            return Ok(result);
+        }
+
+        // GET: api/admin/users
+        [HttpGet("users")]
+        [ProducesResponseType(typeof(List<UserAdminDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<List<UserAdminDto>>> GetUsers()
+        {
+            var users = _dbContext.Users.ToList();
+            var result = new List<UserAdminDto>();
+            foreach (var user in users)
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                result.Add(new UserAdminDto
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    Roles = roles.ToList(),
+                    IsActive = user.IsActive
+                });
+            }
+            return Ok(result);
+        }
+
+        // PATCH: api/admin/users/{id}/ban
+        [HttpPatch("users/{id}/ban")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> BanUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound(new { message = "User not found." });
+            if (!user.IsActive)
+                return Ok(new { message = "User is already banned." });
+            user.IsActive = false;
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+                return Ok(new { message = "User banned successfully." });
+            return StatusCode(500, new { message = "Failed to ban user.", errors = result.Errors });
+        }
+
+        // PATCH: api/admin/users/{id}/unban
+        [HttpPatch("users/{id}/unban")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UnbanUser(string id)
+        {
+            var user = await _userManager.FindByIdAsync(id);
+            if (user == null)
+                return NotFound(new { message = "User not found." });
+            if (user.IsActive)
+                return Ok(new { message = "User is already active." });
+            user.IsActive = true;
+            var result = await _userManager.UpdateAsync(user);
+            if (result.Succeeded)
+                return Ok(new { message = "User unbanned successfully." });
+            return StatusCode(500, new { message = "Failed to unban user.", errors = result.Errors });
+        }
+
+        // GET: api/admin/courses
+        [HttpGet("courses")]
+        [ProducesResponseType(typeof(PagedResult<CourseAdminDto>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PagedResult<CourseAdminDto>>> GetCourses(
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int pageSize = 10)
+        {
+            var query = _dbContext.Courses
+                .Include(c => c.Category)
+                .Include(c => c.Instructor)
+                .AsQueryable();
+
+            var totalCount = await query.CountAsync();
+            var courses = await query
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            var result = courses.Select(c => new CourseAdminDto
+            {
+                Id = c.Id,
+                Title = c.Title,
+                Category = c.Category?.Name ?? "Uncategorized",
+                Instructor = $"{c.Instructor?.FirstName} {c.Instructor?.LastName}",
+                Status = c.IsPublished ? "Published" : "Draft",
+                CreatedDate = c.CreatedAt,
+                Price = c.Price
+            }).ToList();
+
+            return Ok(new PagedResult<CourseAdminDto>(result, totalCount, pageNumber, pageSize));
+        }
+
+        // PATCH: api/admin/courses/{id}/approve
+        [HttpPatch("courses/{id}/approve")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ApproveCourse(int id)
+        {
+            var course = await _dbContext.Courses.FindAsync(id);
+            if (course == null)
+                return NotFound(new { message = "Course not found." });
+
+            course.IsPublished = true;
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(new { message = "Course approved successfully." });
+        }
+
+        // DELETE: api/admin/courses/{id}
+        [HttpDelete("courses/{id}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteCourse(int id)
+        {
+            var course = await _dbContext.Courses
+                .Include(c => c.Sections)
+                .Include(c => c.Ratings)
+                .Include(c => c.BookmarkedByUsers)
+                .Include(c => c.Enrollments)
+                .Include(c => c.InvoiceItems)
+                .Include(c => c.ApplicableCoupons)
+                .Include(c => c.OrderDetails)
+                .FirstOrDefaultAsync(c => c.Id == id);
+            if (course == null)
+                return NotFound(new { message = "Course not found." });
+
+            // Delete Lectures in Sections
+            var sectionIds = course.Sections.Select(s => s.Id).ToList();
+            var lectures = _dbContext.Lectures.Where(l => sectionIds.Contains(l.SectionId));
+            _dbContext.Lectures.RemoveRange(lectures);
+
+            // Delete Sections
+            _dbContext.Sections.RemoveRange(course.Sections);
+
+            // Delete CourseRatings
+            _dbContext.CourseRatings.RemoveRange(course.Ratings);
+
+            // Delete UserBookmarks
+            _dbContext.UserBookmarks.RemoveRange(course.BookmarkedByUsers);
+
+            // Delete OrderDetails (and related Enrollments)
+            var orderDetails = _dbContext.OrderDetails.Where(od => od.CourseId == id);
+            _dbContext.OrderDetails.RemoveRange(orderDetails);
+
+            // Delete Enrollments
+            _dbContext.Enrollments.RemoveRange(course.Enrollments);
+
+            // Delete InvoiceItems
+            _dbContext.InvoiceItems.RemoveRange(course.InvoiceItems);
+
+            // Delete Coupons
+            _dbContext.Coupons.RemoveRange(course.ApplicableCoupons);
+
+            // Delete the course
+            _dbContext.Courses.Remove(course);
+
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(new { message = "Course and all related data deleted successfully." });
+        }
+
+        // PATCH: api/admin/courses/{id}/reject
+        [HttpPatch("courses/{id}/reject")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> RejectCourse(int id)
+        {
+            var course = await _dbContext.Courses.FindAsync(id);
+            if (course == null)
+                return NotFound(new { message = "Course not found." });
+
+            course.IsPublished = false;
+            await _dbContext.SaveChangesAsync();
+
+            return Ok(new { message = "Course rejected successfully." });
+        }
+
+        public class UserAdminDto
+        {
+            public string Id { get; set; }
+            public string UserName { get; set; }
+            public string Email { get; set; }
+            public List<string> Roles { get; set; }
+            public bool IsActive { get; set; }
+        }
+
+        // GET: api/admin/course-categories-distribution
+        [HttpGet("course-categories-distribution")]
+        [ProducesResponseType(typeof(Dictionary<string, int>), StatusCodes.Status200OK)]
+        public ActionResult<Dictionary<string, int>> GetCourseCategoriesDistribution()
+        {
+            var result = _dbContext.Categories
+                .Select(cat => new {
+                    cat.Name,
+                    CourseCount = cat.Courses.Count
+                })
+                .ToList()
+                .ToDictionary(x => x.Name ?? "Other", x => x.CourseCount);
+            return Ok(result);
+        }
+
+        // POST: api/admin/generate-payouts
+        [HttpPost("generate-payouts")]
+        [ProducesResponseType(typeof(GeneratePayoutsResult), StatusCodes.Status200OK)]
+        public async Task<ActionResult<GeneratePayoutsResult>> GeneratePayoutsForAllInstructors([FromBody] GeneratePayoutsRequest request)
+        {
+            var result = new GeneratePayoutsResult { Results = new List<InstructorPayoutResult>() };
+
+            // Get all users in the 'Teacher' role
+            var teachers = await _userManager.GetUsersInRoleAsync("Teacher");
+            if (teachers == null || !teachers.Any())
+            {
+                result.Message = "No instructors found in the 'Teacher' role.";
+                return Ok(result);
+            }
+
+            foreach (var instructor in teachers)
+            {
+                try
+                {
+                    var payout = await _mediator.Send(new GenerateInstructorPayoutCommand
+                    {
+                        InstructorId = instructor.Id,
+                        PaymentMethod = request.PaymentMethod,
+                        Notes = request.Notes
+                    });
+                    result.Results.Add(new InstructorPayoutResult
+                    {
+                        InstructorId = instructor.Id,
+                        InstructorName = $"{instructor.FirstName} {instructor.LastName}",
+                        Success = true,
+                        PayoutId = payout.Id,
+                        Message = "Payout generated successfully."
+                    });
+                }
+                catch (Exception ex)
+                {
+                    result.Results.Add(new InstructorPayoutResult
+                    {
+                        InstructorId = instructor.Id,
+                        InstructorName = $"{instructor.FirstName} {instructor.LastName}",
+                        Success = false,
+                        Message = ex.Message
+                    });
+                }
+            }
+
+            result.Message = $"Processed {result.Results.Count} instructors.";
+            return Ok(result);
+        }
+
+        public class GeneratePayoutsRequest
+        {
+            public string? PaymentMethod { get; set; }
+            public string? Notes { get; set; }
+        }
+
+        public class GeneratePayoutsResult
+        {
+            public string? Message { get; set; }
+            public List<InstructorPayoutResult> Results { get; set; } = new List<InstructorPayoutResult>();
+        }
+
+        public class InstructorPayoutResult
+        {
+            public string InstructorId { get; set; } = string.Empty;
+            public string InstructorName { get; set; } = string.Empty;
+            public bool Success { get; set; }
+            public int? PayoutId { get; set; }
+            public string? Message { get; set; }
+        }
+
+        public class CourseAdminDto
+        {
+            public int Id { get; set; }
+            public string Title { get; set; }
+            public string Category { get; set; }
+            public string Instructor { get; set; }
+            public string Status { get; set; }
+            public DateTime CreatedDate { get; set; }
+            public decimal Price { get; set; }
         }
     }
 
@@ -366,5 +680,8 @@ namespace IlmPath.Api.Controllers
         public decimal TotalApprovedAmount { get; set; }
         public decimal TotalCompletedAmount { get; set; }
         public DateTime LastUpdated { get; set; }
+        public int TotalUsers { get; set; }
+        public int TotalCourses { get; set; }
+        public decimal TotalRevenue { get; set; }
     }
 } 

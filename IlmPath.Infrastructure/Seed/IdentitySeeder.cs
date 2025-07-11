@@ -28,7 +28,7 @@ public class IdentitySeeder
 
     private async Task SeedRolesAsync()
     {
-        string[] roleNames = { "Admin", "Teacher", "User" };
+        string[] roleNames = { "Admin", "User" };
 
         foreach (var roleName in roleNames)
         {
@@ -60,25 +60,6 @@ public class IdentitySeeder
             }
         }
 
-        // Seed Teacher User
-        if (await _userManager.FindByNameAsync("teacher") == null)
-        {
-            var teacherUser = new ApplicationUser
-            {
-                UserName = "teacher",
-                Email = "teacher@ilmpath.com",
-                FirstName = "Teacher",
-                LastName = "User",
-                EmailConfirmed = true,
-                IsActive = true
-            };
-            var result = await _userManager.CreateAsync(teacherUser, "Teacher@123");
-            if (result.Succeeded)
-            {
-                await _userManager.AddToRoleAsync(teacherUser, "Teacher");
-            }
-        }
-
         // Seed Basic User
         if (await _userManager.FindByNameAsync("user") == null)
         {
@@ -95,6 +76,82 @@ public class IdentitySeeder
             if (result.Succeeded)
             {
                 await _userManager.AddToRoleAsync(basicUser, "User");
+            }
+        }
+
+        // Seed Instructor 1
+        if (await _userManager.FindByNameAsync("instructor1") == null)
+        {
+            var instructor1 = new ApplicationUser
+            {
+                UserName = "instructor1",
+                Email = "instructor1@ilmpath.com",
+                FirstName = "Instructor",
+                LastName = "One",
+                EmailConfirmed = true,
+                IsActive = true
+            };
+            var result = await _userManager.CreateAsync(instructor1, "Instructor1@123");
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(instructor1, "User");
+            }
+        }
+
+        // Seed Instructor 2
+        if (await _userManager.FindByNameAsync("instructor2") == null)
+        {
+            var instructor2 = new ApplicationUser
+            {
+                UserName = "instructor2",
+                Email = "instructor2@ilmpath.com",
+                FirstName = "Instructor",
+                LastName = "Two",
+                EmailConfirmed = true,
+                IsActive = true
+            };
+            var result = await _userManager.CreateAsync(instructor2, "Instructor2@123");
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(instructor2, "User");
+            }
+        }
+
+        // Seed Student 1
+        if (await _userManager.FindByNameAsync("student1") == null)
+        {
+            var student1 = new ApplicationUser
+            {
+                UserName = "student1",
+                Email = "student1@ilmpath.com",
+                FirstName = "Student",
+                LastName = "One",
+                EmailConfirmed = true,
+                IsActive = true
+            };
+            var result = await _userManager.CreateAsync(student1, "Student1@123");
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(student1, "User");
+            }
+        }
+
+        // Seed Student 2
+        if (await _userManager.FindByNameAsync("student2") == null)
+        {
+            var student2 = new ApplicationUser
+            {
+                UserName = "student2",
+                Email = "student2@ilmpath.com",
+                FirstName = "Student",
+                LastName = "Two",
+                EmailConfirmed = true,
+                IsActive = true
+            };
+            var result = await _userManager.CreateAsync(student2, "Student2@123");
+            if (result.Succeeded)
+            {
+                await _userManager.AddToRoleAsync(student2, "User");
             }
         }
     }
