@@ -36,17 +36,10 @@ namespace IlmPath.Api.Controllers
         [ProducesResponseType(typeof(PagedResult<InstructorEnrollmentAnalytics>), StatusCodes.Status200OK)]
         public async Task<ActionResult<PagedResult<InstructorEnrollmentAnalytics>>> GetInstructorEnrollments(
             [FromQuery] int pageNumber = 1, 
-            [FromQuery] int pageSize = 1000,
-            [FromQuery] string? instructorId = null)
+            [FromQuery] int pageSize = 1000)
         {
             var currentUserId = GetCurrentUserId();
-            var targetInstructorId = instructorId ?? currentUserId;
-
-            // For security, only allow instructors to view their own data
-            if (instructorId != null && instructorId != currentUserId)
-            {
-                return Forbid("You can only view your own analytics data");
-            }
+            var targetInstructorId = currentUserId;
 
             // Get all enrollments with course information
             var query = new GetAllEnrollmentsQuery(pageNumber, pageSize, null, targetInstructorId);
@@ -57,10 +50,22 @@ namespace IlmPath.Api.Controllers
                 Id = e.Id,
                 UserId = e.UserId,
                 CourseId = e.CourseId,
-                EnrollmentDate = e.EnrollmentDate.ToString("yyyy-MM-dd"),
+                EnrollmentDate = e.EnrollmentDate,
                 PricePaid = e.PricePaid,
-                CourseName = e.Course?.Title ?? "Unknown Course",
-                UserName = e.User?.UserName ?? "Unknown User"
+                User = e.User != null ? new UserDetails
+                {
+                    Id = e.User.Id,
+                    FirstName = e.User.FirstName ?? "",
+                    LastName = e.User.LastName ?? "",
+                    Email = e.User.Email ?? "",
+                    ProfileImageUrl = e.User.ProfileImageUrl
+                } : null,
+                Course = e.Course != null ? new CourseDetails
+                {
+                    Id = e.Course.Id,
+                    Title = e.Course.Title,
+                    ThumbnailImageUrl = e.Course.ThumbnailImageUrl
+                } : null
             }).ToList();
 
             return Ok(new PagedResult<InstructorEnrollmentAnalytics>(analyticsData, totalCount, pageNumber, pageSize));
@@ -169,10 +174,10 @@ namespace IlmPath.Api.Controllers
         public int Id { get; set; }
         public string UserId { get; set; } = string.Empty;
         public int CourseId { get; set; }
-        public string EnrollmentDate { get; set; } = string.Empty;
+        public DateTime EnrollmentDate { get; set; }
         public decimal PricePaid { get; set; }
-        public string CourseName { get; set; } = string.Empty;
-        public string UserName { get; set; } = string.Empty;
+        public UserDetails? User { get; set; }
+        public CourseDetails? Course { get; set; }
     }
 
     public class InstructorRevenueSummary
@@ -205,5 +210,21 @@ namespace IlmPath.Api.Controllers
         public decimal Revenue { get; set; }
         public int Enrollments { get; set; }
         public int UniqueStudents { get; set; }
+    }
+
+    public class UserDetails
+    {
+        public string Id { get; set; } = string.Empty;
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string? ProfileImageUrl { get; set; }
+    }
+
+    public class CourseDetails
+    {
+        public int Id { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public string? ThumbnailImageUrl { get; set; }
     }
 } 
