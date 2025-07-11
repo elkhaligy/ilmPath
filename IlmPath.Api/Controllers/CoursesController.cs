@@ -154,9 +154,19 @@ namespace IlmPath.Api.Controllers
             {
                 return Unauthorized("User not authenticated");
             }
+            // Check if user is admin or course owner before allowing delete
+            var isAdmin = User.IsInRole("Admin");
+            var course = await _mediator.Send(new GetCourseByIdQuery(id));
+            
+            if (course == null)
+            {
+                return NotFound();
+            }
 
-            // TODO: Add authorization check to ensure user owns this course
-            // For now, we'll let the command handler deal with authorization
+            if (!isAdmin && course.InstructorId != currentUserId)
+            {
+                return Forbid("Only course owners or administrators can delete courses");
+            }
 
             var command = new DeleteCourseCommand(id);
             await _mediator.Send(command);

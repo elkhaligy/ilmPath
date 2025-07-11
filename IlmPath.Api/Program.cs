@@ -105,10 +105,10 @@ public class Program
         app.UseStaticFiles();
         // app.UseHttpsRedirection();
         app.UseMiddleware<ExceptionHandlerMiddleware>();
+        app.UseCors("AllowAllOrigins");
 
         app.UseAuthentication();
         app.UseAuthorization();
-        app.UseCors("AllowAllOrigins");
         app.MapControllers();
 
         app.Run();

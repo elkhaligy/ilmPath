@@ -142,13 +142,15 @@ namespace IlmPath.Api.Controllers
 
             // Construct the request body that will be sent to the Hugging Face Router.
             // This must match the RouterApiCompletionRequest DTO structure.
+            var systemPrompt = "You are an AI assistant for the IlmPath e-learning platform. Only answer questions about IlmPath, its features, its courses, and its instructors. If a user asks about anything else, politely decline and redirect them to IlmPath topics.";
             var routerRequestBody = new RouterApiCompletionRequest
             {
                 Model = requestDto.Model, // Use the model name from the frontend request
                 Messages = new List<RouterApiRequestMessage>
-            {
-                new RouterApiRequestMessage { Role = "user", Content = requestDto.Inputs } // Use the user's message
-            },
+                {
+                    new RouterApiRequestMessage { Role = "system", Content = systemPrompt },
+                    new RouterApiRequestMessage { Role = "user", Content = requestDto.Inputs }
+                },
                 Stream = false // We are expecting a non-streaming response
             };
 
