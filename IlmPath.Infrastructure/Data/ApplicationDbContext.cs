@@ -40,6 +40,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
     public DbSet<Coupon> Coupons { get; set; }
     public DbSet<AppliedCoupon> AppliedCoupons { get; set; }
 
+    // Instructor Payouts
+    public DbSet<InstructorPayout> InstructorPayouts { get; set; }
+    public DbSet<PayoutEnrollment> PayoutEnrollments { get; set; }
+
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -182,6 +186,33 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser, IdentityR
                   .WithMany(p => p.AppliedCoupons)
                   .HasForeignKey(ac => ac.PaymentId)
                   .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        // InstructorPayout
+        builder.Entity<InstructorPayout>(entity =>
+        {
+            entity.HasOne(ip => ip.Instructor)
+                  .WithMany()
+                  .HasForeignKey(ip => ip.InstructorId)
+                  .OnDelete(DeleteBehavior.NoAction);
+        });
+
+        // PayoutEnrollment
+        builder.Entity<PayoutEnrollment>(entity =>
+        {
+            entity.HasOne(pe => pe.Payout)
+                  .WithMany(p => p.PayoutEnrollments)
+                  .HasForeignKey(pe => pe.PayoutId)
+                  .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(pe => pe.Enrollment)
+                  .WithMany()
+                  .HasForeignKey(pe => pe.EnrollmentId)
+                  .OnDelete(DeleteBehavior.NoAction);
+
+            // Prevent duplicate enrollments in payouts
+            entity.HasIndex(pe => pe.EnrollmentId)
+                  .IsUnique();
         });
 
         // Define decimal precision for all relevant properties (Fluent API is more DRY)
