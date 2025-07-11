@@ -10,7 +10,8 @@ public class ApplicationUser : IdentityUser
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public DateTime? LastModifiedAt { get; set; }
     public bool IsActive { get; set; } = true;
-    public string? ProfileImageUrl { get; set; } 
+    public string? ProfileImageUrl { get; set; }
+    public string? StripeConnectAccountId { get; set; } // For instructor payouts via Stripe Connect
 
     // Navigation properties
     public virtual ICollection<Enrollment> Enrollments { get; set; } = new List<Enrollment>();

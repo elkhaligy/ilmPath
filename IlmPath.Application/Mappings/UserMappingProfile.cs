@@ -8,7 +8,8 @@ namespace IlmPath.Application.Mappings
     {
         public UserMappingProfile()
         {
-            CreateMap<ApplicationUser, UserProfileResponse>();
+            CreateMap<ApplicationUser, UserProfileResponse>()
+                .ForMember(dest => dest.ProfilePictureUrl, opt => opt.MapFrom(src => src.ProfileImageUrl));
         }
     }
 } 
