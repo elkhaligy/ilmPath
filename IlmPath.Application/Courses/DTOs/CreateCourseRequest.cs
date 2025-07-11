@@ -15,11 +15,10 @@ namespace IlmPath.Application.Courses.DTOs
         [Required]
         public decimal Price { get; set; }
 
-        [Required]
-        public string InstructorId { get; set; } = string.Empty;
-
         public int? CategoryId { get; set; }
 
         public IFormFile? ThumbnailFile { get; set; }
+
+        public bool IsPublished { get; set; } = false;
     }
 } 

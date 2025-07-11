@@ -11,6 +11,7 @@ using IlmPath.Infrastructure.InvoiceItems.Persistence;
 using IlmPath.Infrastructure.Invoices.Persistence;
 using IlmPath.Infrastructure.Lectures.Persistence;
 using IlmPath.Infrastructure.OrderDetails.Persistence;
+using IlmPath.Infrastructure.Payouts.Persistence;
 using IlmPath.Infrastructure.Payments.Persistence;
 using IlmPath.Infrastructure.Sections.Persistence;
 using IlmPath.Infrastructure.Seed;
@@ -93,12 +94,14 @@ public static class DependencyInjection
         services.AddScoped<ISectionRepository, SectionRepository>();
         services.AddScoped<IAppliedCouponRepository, AppliedCouponRepository>();
         services.AddScoped<ICourseRatingRepository, CourseRatingRepository>();
+        services.AddScoped<IInstructorPayoutRepository, InstructorPayoutRepository>();
 
 
         services.AddScoped<ICartRepository, RedisCartRepository>();
         
         // Services
         services.AddScoped<IStripeService, StripeService>();
+        services.AddScoped<IStripeConnectService, StripeConnectService>();
         services.AddScoped<IVideoUploadService, GoogleCloudStorageService>();
         
         return services;

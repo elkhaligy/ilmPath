@@ -26,18 +26,19 @@ public class DataSeeder
     {
         await _context.Database.MigrateAsync();
 
-
         if (await _context.Categories.AnyAsync()) return;
 
+        // Get or create instructor and student users
+        var instructorUser = await _context.Users.AsNoTracking().FirstOrDefaultAsync();
+        var studentUser = await _context.Users.AsNoTracking().Skip(1).FirstOrDefaultAsync(); // Get second user if exists
 
-        var user = await _context.Users.AsNoTracking().FirstOrDefaultAsync();
-
-        if (user != null)
+        if (instructorUser != null)
         {
             await SeedCategoriesAsync();
             await _context.SaveChangesAsync();
 
-            await SeedCoursesAsync(user.Id);
+            // Create courses with instructor as the course creator
+            await SeedCoursesAsync(instructorUser.Id);
             await _context.SaveChangesAsync();
 
             await SeedSectionsAsync();
@@ -46,35 +47,38 @@ public class DataSeeder
             await SeedLecturesAsync();
             await _context.SaveChangesAsync();
 
-            await SeedCouponsAsync(user.Id);
+            await SeedCouponsAsync(instructorUser.Id);
             await _context.SaveChangesAsync();
 
-            // A user can only have one cart.
+            // Create cart for student (or instructor if no student exists)
+            var cartUserId = studentUser?.Id ?? instructorUser.Id;
+            await SeedCartWithItemsAsync(cartUserId);
 
-            await SeedCartWithItemsAsync(user.Id);
-
-            await SeedEnrollmentsAsync(user.Id);
+            // Create enrollments for student user (or instructor if no student exists)
+            // This creates a realistic scenario where students enroll in instructor's courses
+            var enrollmentUserId = studentUser?.Id ?? instructorUser.Id;
+            await SeedEnrollmentsAsync(enrollmentUserId);
             await _context.SaveChangesAsync();
 
-            await SeedCourseRatingsAsync(user.Id);
+            await SeedCourseRatingsAsync(enrollmentUserId);
             await _context.SaveChangesAsync();
 
-            await SeedUserBookmarksAsync(user.Id);
+            await SeedUserBookmarksAsync(enrollmentUserId);
             await _context.SaveChangesAsync();
 
-            await SeedPaymentsAsync(user.Id);
+            await SeedPaymentsAsync(enrollmentUserId);
             await _context.SaveChangesAsync();
 
             await SeedOrderDetailsAsync();
             await _context.SaveChangesAsync();
 
-            await SeedInvoicesAsync(user.Id);
+            await SeedInvoicesAsync(enrollmentUserId);
             await _context.SaveChangesAsync();
 
             await SeedInvoiceItemsAsync();
             await _context.SaveChangesAsync();
 
-            await SeedAppliedCouponsAsync(user.Id);
+            await SeedAppliedCouponsAsync(enrollmentUserId);
             await _context.SaveChangesAsync();
         }
     }
@@ -199,6 +203,8 @@ public class DataSeeder
         var courses = await _context.Courses.Where(c => c.IsPublished).ToListAsync();
         if (!courses.Any()) return;
 
+        // Create enrollments where the userId (student) enrolls in courses created by different instructors
+        // This creates the scenario needed for instructor payouts: students paying for instructor courses
         var enrollments = courses.Select(course => new Enrollment { UserId = userId, CourseId = course.Id, PricePaid = course.Price }).ToList();
         await _context.Enrollments.AddRangeAsync(enrollments);
     }

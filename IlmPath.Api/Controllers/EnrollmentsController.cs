@@ -10,6 +10,7 @@ using IlmPath.Application.Enrollments.DTOs.Responses;
 using IlmPath.Application.Enrollments.Queries.GetAllEnrollments;
 using IlmPath.Application.Enrollments.Queries.GetEnrollmentById;
 using IlmPath.Application.Enrollments.Queries.CheckEnrollment;
+using IlmPath.Application.Enrollments.Queries.GetInstructorStudentsCount;
 using IlmPath.Domain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -66,6 +67,16 @@ public class EnrollmentsController : ControllerBase
         var (enrollments, totalCount) = await _mediator.Send(query);
         var enrollmentResponses = _mapper.Map<List<EnrollmentResponse>>(enrollments);
         return Ok(new PagedResult<EnrollmentResponse>(enrollmentResponses, totalCount, pageNumber, pageSize));
+    }
+
+    // GET: api/enrollments/instructor/{instructorId}/students-count
+    [HttpGet("instructor/{instructorId}/students-count")]
+    [ProducesResponseType(typeof(int), StatusCodes.Status200OK)]
+    public async Task<ActionResult<int>> GetInstructorStudentsCount(string instructorId)
+    {
+        var query = new GetInstructorStudentsCountQuery(instructorId);
+        var result = await _mediator.Send(query);
+        return Ok(result);
     }
 
     // GET: api/enrollments/{id}

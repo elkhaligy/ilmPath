@@ -33,6 +33,7 @@ namespace IlmPath.Application.Courses.Commands.CreateCourse
             var course = _mapper.Map<Course>(request);
             course.CreatedAt = DateTime.UtcNow;
             course.UpdatedAt = DateTime.UtcNow;
+            course.IsPublished = request.IsPublished; // Set the publish status from request
 
             // Handle thumbnail upload if provided
             if (request.ThumbnailFile != null)

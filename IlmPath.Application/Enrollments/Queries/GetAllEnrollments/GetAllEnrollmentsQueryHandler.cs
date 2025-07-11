@@ -23,7 +23,12 @@ public class GetAllEnrollmentsQueryHandler : IRequestHandler<GetAllEnrollmentsQu
 
     public async Task<(IEnumerable<Enrollment>, int count)> Handle(GetAllEnrollmentsQuery request, CancellationToken cancellationToken)
     {
-        if (!string.IsNullOrEmpty(request.UserId))
+        if (!string.IsNullOrEmpty(request.InstructorId))
+        {
+            var (enrollments, totalCount) = await _enrollmentRepository.GetEnrollmentsByInstructorIdAsync(request.InstructorId, request.PageNumber, request.PageSize);
+            return (enrollments, totalCount);
+        }
+        else if (!string.IsNullOrEmpty(request.UserId))
         {
             var (enrollments, totalCount) = await _enrollmentRepository.GetEnrollmentsByUserIdAsync(request.UserId, request.PageNumber, request.PageSize);
             return (enrollments, totalCount);

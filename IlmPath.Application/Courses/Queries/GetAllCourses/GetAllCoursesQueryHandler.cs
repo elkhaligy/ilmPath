@@ -16,7 +16,7 @@ namespace IlmPath.Application.Courses.Queries.GetAllCourses
 
         public async Task<PagedResult<CourseResponse>> Handle(GetAllCoursesQuery request, CancellationToken cancellationToken)
         {
-            var (courses, totalCount) = await _courseRepository.GetAllAsync(request.PageNumber, request.PageSize);
+            var (courses, totalCount) = await _courseRepository.GetAllAsync(request.PageNumber, request.PageSize, request.SearchQuery);
 
             var courseResponses = _mapper.Map<List<CourseResponse>>(courses);
 

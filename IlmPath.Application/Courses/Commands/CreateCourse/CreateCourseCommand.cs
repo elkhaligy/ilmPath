@@ -15,5 +15,6 @@ namespace IlmPath.Application.Courses.Commands.CreateCourse
         decimal Price,
         string InstructorId,
         int? CategoryId,
-        IFormFile? ThumbnailFile) : IRequest<CourseResponse>;
+        IFormFile? ThumbnailFile,
+        bool IsPublished) : IRequest<CourseResponse>;
 }
