@@ -6,6 +6,8 @@
 
 A comprehensive e-learning platform backend built with **Clean Architecture** principles using **ASP.NET Core 9.0**. The IlmPath API provides a robust foundation for managing online courses, user authentication, payments, video streaming, and AI-powered features.
 
+[Video Preview](https://drive.google.com/file/d/1An5ozWmdxH1Gn0MPDvNcTrDt-TlVGGyn/view?usp=sharing)
+
 ## 🔗 Related Repositories
 
 - **Frontend Application**: [IlmPath Frontend](https://github.com/ahmedtalaat97/ilmPathFrontend) - Angular 19 with Material Design
